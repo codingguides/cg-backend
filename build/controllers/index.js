@@ -1,0 +1,23 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RootController = void 0;
+const express_1 = require("express");
+const guards_1 = require("../guards");
+const user_1 = require("./user");
+const topic_1 = require("./topic");
+const tag_1 = require("./tag");
+const relation_1 = require("./relation");
+const subtopic_1 = require("./subtopic");
+const subtopicdescription_1 = require("./subtopicdescription");
+const quiz_1 = require("./quiz");
+console.log(">>>>>>>>>>>Authguard<<<<<<<<<<<", guards_1.Authguard);
+exports.RootController = (0, express_1.Router)();
+console.log("<=============controller=============>");
+exports.RootController.use("/user", user_1.UserController);
+exports.RootController.use("/topic", guards_1.Authguard, topic_1.TopicController);
+exports.RootController.use("/tags", guards_1.Authguard, tag_1.TagsController);
+exports.RootController.use("/relation", guards_1.Authguard, relation_1.RelationController);
+exports.RootController.use("/subtopic", guards_1.Authguard, subtopic_1.SubTopicController);
+exports.RootController.use("/subtopicdescription", guards_1.Authguard, subtopicdescription_1.SubTopicDescriptionController);
+exports.RootController.use("/quiz", guards_1.Authguard, quiz_1.QuizController);
+//# sourceMappingURL=index.js.map

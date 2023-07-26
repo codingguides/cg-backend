@@ -1,0 +1,54 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Fanease Api's",
+        "version": "1.0.0",
+        "description": "Fanease Api's"
+    },
+    "servers": [
+        {
+            "url": "http://180.149.241.208:3059/"
+        }
+    ],
+    "security": [
+        {
+            "ApiKeyAuth": []
+        }
+    ],
+    "paths": {
+        "/api/user/login": {
+            "get": {
+                "tags": [
+                    "Fanease Api's"
+                ],
+                "description": "Fanease",
+                "parameters": [
+                    {
+                        "phone" : "9000000001",
+                        "password" : "123456"
+                    }
+                ],
+                "responses": {
+                    "result": "ok",
+                    "data": {
+                        "data": {
+                            "_id": "60901e2e97323c6aa8f35c9a",
+                            "name": "John Deo",
+                            "email": "test@gmail.com",
+                            "phone": "9000000001",
+                            "password": "$2b$10$UwB5en71esinNKt4L3HJ/u6gyy/Y0UUm2uGsMqVdNsD9YQTuoEa6W",
+                            "role": "1",
+                            "isdelete": false,
+                            "lastlogindate": "Mon May 03 2021 21:30:46 GMT+0530 (India Standard Time)",
+                            "createdAt": "2021-05-03T16:00:46.792Z",
+                            "updatedAt": "2021-05-11T10:32:04.830Z",
+                            "__v": 0
+                        },
+                        "tokenType": "Bearer",
+                        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTAxZTJlOTczMjNjNmFhOGYzNWM5YSIsIm5hbWUiOiJSdW1wYSBQYXVsIiwiZW1haWwiOiJydW1wYXBhdWxAZ21haWwuY29tIiwicGhvbmUiOiI5MDUxNTg4Mjk2IiwiaWF0IjoxNjIxMzQyNDQ5LCJleHAiOjE2MjM5MzQ0NDl9.rArUu5nxufHqAoW2g0bL1TbuyAe85IpXvTS3AVYo-o4"
+                    }
+                }
+            }
+        }
+    }
+}
