@@ -10,8 +10,8 @@ const TopicSchema = new Schema({
         type: String
     },
     parent_id: {
-        type: String,
-        default: '0'
+        type: Schema.Types.ObjectId,
+        ref: 'Topics'
     },
     user_id: {
         type: Schema.Types.ObjectId, 

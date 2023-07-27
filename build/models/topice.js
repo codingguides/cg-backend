@@ -13,8 +13,8 @@ const TopicSchema = new mongoose_1.Schema({
         type: String
     },
     parent_id: {
-        type: String,
-        default: '0'
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Topics'
     },
     user_id: {
         type: mongoose_1.Schema.Types.ObjectId,

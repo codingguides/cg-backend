@@ -11,6 +11,7 @@ console.log("<=========================topic -===============>");
 exports.TopicController.post('/add', (0, express_validator_1.check)('name').not().isEmpty().withMessage('Topic is required'), (0, express_validator_1.check)('description').not().isEmpty().withMessage('Description is required'), (0, express_validator_1.check)('slug').not().isEmpty().withMessage('slug is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), async (request, response, next) => {
     try {
         console.log("<=========================try -===============>");
+        var ObjectId = require('mongodb').ObjectId;
         const errors = (0, express_validator_1.validationResult)(request);
         if (!errors.isEmpty()) {
             return response.status(400).json({ errors: errors.array() });
@@ -31,7 +32,14 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
                     description: body.description,
                     slug: body.slug,
                     user_id: body.user_id,
-                    parent_id: body.parent_id
+                    parent_id: ObjectId(body.parent_id)
+                });
+                console.log({
+                    name: body.name,
+                    description: body.description,
+                    slug: body.slug,
+                    user_id: body.user_id,
+                    parent_id: ObjectId(body.parent_id)
                 });
                 topicData.save(function (err, data) {
                     if (data) {
@@ -128,6 +136,40 @@ exports.TopicController.get('/get/:id', async (request, response, next) => {
                             "msg": "Oops! topic not found."
                         }
                     ]
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.TopicController.get('/', async (request, response, next) => {
+    try {
+        await models_1.TopicModel.aggregate([
+            {
+                $lookup: {
+                    from: "topics",
+                    localField: "parent_id",
+                    foreignField: "_id",
+                    as: "parentDetails"
+                }
+            }
+        ])
+            // await TopicModel.find()
+            .then((val) => {
+            if (val) {
+                response.status(200).send({
+                    "status": "SUCCESS",
+                    "msg": "Topics details successfully",
+                    "payload": val
+                });
+            }
+            else {
+                response.status(404).send({
+                    "status": "ERROR",
+                    "msg": "Oops! topic not found.",
+                    "payload": []
                 });
             }
         });
