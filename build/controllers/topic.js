@@ -42,11 +42,23 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
                     parent_id: ObjectId(body.parent_id)
                 });
                 topicData.save(function (err, data) {
+                    // if (data) {
+                    //   response.status(200).send(topicData)
+                    // } else if (err) throw err;
                     if (data) {
-                        response.status(200).send(topicData);
+                        response.status(200).send({
+                            "status": "SUCCESS",
+                            "msg": "Topics Added successfully",
+                            "payload": data
+                        });
                     }
-                    else if (err)
-                        throw err;
+                    else {
+                        response.status(404).send({
+                            "status": "ERROR",
+                            "msg": "Oops! something wrong",
+                            err
+                        });
+                    }
                 });
             }
         }

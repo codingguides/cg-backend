@@ -50,9 +50,22 @@ TopicController.post('/add',
           })
           topicData.save(
             function (err, data) {
+              // if (data) {
+              //   response.status(200).send(topicData)
+              // } else if (err) throw err;
               if (data) {
-                response.status(200).send(topicData)
-              } else if (err) throw err;
+                response.status(200).send({
+                  "status": "SUCCESS",
+                  "msg": "Topics Added successfully",
+                  "payload": data
+                });
+              } else {
+                response.status(404).send({
+                  "status": "ERROR",
+                  "msg": "Oops! something wrong",
+                  err
+                });
+              }
             }
           );
         }
