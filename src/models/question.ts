@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-const QuizSchema = new Schema({
+const QuestionSchema = new Schema({
     question: {
         type: String,
     },
@@ -10,13 +10,13 @@ const QuizSchema = new Schema({
     point: {
         type: String
     },
-    type: {
+    level: {
         type: String,
-        enum: ["Advance", "Intermediate"],
+        enum: ["advance", "intermediate", "beginners"],
     },
     questiontype: {
         type: String,
-        enum: ["Fill-in-the-blanks", "Checkbox", "Radio-button"],
+        enum: ["fillintheblanks", "checkbox", "radiobutton", "text"],
     },
     topic_id: {
         type: Schema.Types.ObjectId, 
@@ -25,4 +25,4 @@ const QuizSchema = new Schema({
 
 }, { timestamps: true });
 
-export const QuizModel = model("quiz", QuizSchema);
+export const QuestionModel = model("questions", QuestionSchema);

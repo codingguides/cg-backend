@@ -8,35 +8,41 @@ export const TagsController = Router();
 
 TagsController.post('/add', 
   check('name').not().isEmpty().withMessage('Tag is required'),
+  check('type').not().isEmpty().withMessage('Tag type is required'),
   async (request: Request, response: Response, next: NextFunction) => {
   try {
-
+    var ObjectId = require('mongodb').ObjectId;
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
       return response.status(400).json({ errors: errors.array() });
     } else {
       const { body } = request;
+
       await TagsModel.syncIndexes();
-      const data = await TagsModel.find({ "name": body.name });
-
-      if (data.length > 0) {
-        response.status(200).send({
-          "success": false,
-          "message": "Tag already exists."
-        });
-      } else {
-
-        let tagData = new TagsModel({
-          name: body.name
-        });
-        tagData.save(
-          function (err, data) {
-            if (data) {
-              response.status(200).send(tagData)
-            } else if (err) throw err;
+      let tagData = new TagsModel({
+        name: body.name,
+        type: body.type,
+        topic_id: ObjectId(body.topic_id),
+        question_id: ObjectId(body.question_id)
+      });
+      tagData.save(
+        function (err, data) {
+          if (data) {
+            response.status(200).send({
+              "status": "SUCCESS",
+              "msg": "Tags Added successfully",
+              "payload": data
+            });
+          } else {
+            response.status(404).send({
+              "status": "ERROR",
+              "msg": "Oops! something wrong",
+              err
+            });
           }
-        );
-      }
+        }
+      );
+
     }
 
   } catch (error) {

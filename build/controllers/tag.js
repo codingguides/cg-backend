@@ -6,8 +6,9 @@ const models_1 = require("../models");
 const express_validator_1 = require("express-validator");
 const guards_1 = require("../guards");
 exports.TagsController = (0, express_1.Router)();
-exports.TagsController.post('/add', (0, express_validator_1.check)('name').not().isEmpty().withMessage('Tag is required'), async (request, response, next) => {
+exports.TagsController.post('/add', (0, express_validator_1.check)('name').not().isEmpty().withMessage('Tag is required'), (0, express_validator_1.check)('type').not().isEmpty().withMessage('Tag type is required'), async (request, response, next) => {
     try {
+        var ObjectId = require('mongodb').ObjectId;
         const errors = (0, express_validator_1.validationResult)(request);
         if (!errors.isEmpty()) {
             return response.status(400).json({ errors: errors.array() });
@@ -15,25 +16,28 @@ exports.TagsController.post('/add', (0, express_validator_1.check)('name').not()
         else {
             const { body } = request;
             await models_1.TagsModel.syncIndexes();
-            const data = await models_1.TagsModel.find({ "name": body.name });
-            if (data.length > 0) {
-                response.status(200).send({
-                    "success": false,
-                    "message": "Tag already exists."
-                });
-            }
-            else {
-                let tagData = new models_1.TagsModel({
-                    name: body.name
-                });
-                tagData.save(function (err, data) {
-                    if (data) {
-                        response.status(200).send(tagData);
-                    }
-                    else if (err)
-                        throw err;
-                });
-            }
+            let tagData = new models_1.TagsModel({
+                name: body.name,
+                type: body.type,
+                topic_id: ObjectId(body.topic_id),
+                question_id: ObjectId(body.question_id)
+            });
+            tagData.save(function (err, data) {
+                if (data) {
+                    response.status(200).send({
+                        "status": "SUCCESS",
+                        "msg": "Tags Added successfully",
+                        "payload": data
+                    });
+                }
+                else {
+                    response.status(404).send({
+                        "status": "ERROR",
+                        "msg": "Oops! something wrong",
+                        err
+                    });
+                }
+            });
         }
     }
     catch (error) {

@@ -37,7 +37,7 @@ TopicController.post('/add',
             name: body.name,
             description: body.description,
             slug: body.slug,
-            user_id: body.user_id,
+            user_id: ObjectId(body.user_id),
             parent_id: ObjectId(body.parent_id)
           });
 
@@ -50,9 +50,6 @@ TopicController.post('/add',
           })
           topicData.save(
             function (err, data) {
-              // if (data) {
-              //   response.status(200).send(topicData)
-              // } else if (err) throw err;
               if (data) {
                 response.status(200).send({
                   "status": "SUCCESS",

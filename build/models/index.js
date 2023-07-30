@@ -17,10 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./user"), exports);
 __exportStar(require("./interview"), exports);
 __exportStar(require("./metatags"), exports);
-__exportStar(require("./quiz"), exports);
-__exportStar(require("./relation"), exports);
-__exportStar(require("./subtopice"), exports);
+__exportStar(require("./question"), exports);
 __exportStar(require("./tags"), exports);
 __exportStar(require("./topice"), exports);
-__exportStar(require("./subtopicedescription"), exports);
 //# sourceMappingURL=index.js.map
