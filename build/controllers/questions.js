@@ -1,50 +1,41 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TopicController = void 0;
+exports.QuestionsController = void 0;
 const express_1 = require("express");
 const models_1 = require("../models");
 const express_validator_1 = require("express-validator");
-exports.TopicController = (0, express_1.Router)();
-console.log("<=========================topic -===============>");
-// Authguard,
-exports.TopicController.post('/add', (0, express_validator_1.check)('name').not().isEmpty().withMessage('Topic is required'), (0, express_validator_1.check)('description').not().isEmpty().withMessage('Description is required'), (0, express_validator_1.check)('slug').not().isEmpty().withMessage('slug is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), async (request, response, next) => {
+exports.QuestionsController = (0, express_1.Router)();
+exports.QuestionsController.post('/add', (0, express_validator_1.check)('question').not().isEmpty().withMessage('Question is required'), (0, express_validator_1.check)('options').not().isEmpty().withMessage('options is required'), (0, express_validator_1.check)('rightoption').not().isEmpty().withMessage('rightoption is required'), (0, express_validator_1.check)('level').not().isEmpty().withMessage('level is required'), (0, express_validator_1.check)('questiontype').not().isEmpty().withMessage('questiontype is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), async (request, response, next) => {
     try {
-        console.log("<=========================try -===============>");
-        var ObjectId = require('mongodb').ObjectId;
         const errors = (0, express_validator_1.validationResult)(request);
         if (!errors.isEmpty()) {
             return response.status(400).json({ errors: errors.array() });
         }
         else {
             const { body } = request;
-            await models_1.TopicModel.syncIndexes();
-            const data = await models_1.TopicModel.find({ "name": body.name });
+            await models_1.QuestionModel.syncIndexes();
+            const data = await models_1.QuestionModel.find({ "question": body.question });
             if (data.length > 0) {
                 response.status(200).send({
                     "success": false,
-                    "message": "Topic already exists."
+                    "message": "Question already exists."
                 });
             }
             else {
-                let topicData = new models_1.TopicModel({
-                    name: body.name,
-                    description: body.description,
-                    slug: body.slug,
-                    user_id: ObjectId(body.user_id),
-                    parent_id: ObjectId(body.parent_id)
+                let QuestionData = new models_1.QuestionModel({
+                    question: body.question,
+                    options: body.options,
+                    rightoption: body.rightoption,
+                    point: body.point,
+                    level: body.level,
+                    questiontype: body.questiontype,
+                    user_id: body.user_id
                 });
-                console.log({
-                    name: body.name,
-                    description: body.description,
-                    slug: body.slug,
-                    user_id: body.user_id,
-                    parent_id: ObjectId(body.parent_id)
-                });
-                topicData.save(function (err, data) {
+                QuestionData.save(function (err, data) {
                     if (data) {
                         response.status(200).send({
                             "status": "SUCCESS",
-                            "msg": "Topics Added successfully",
+                            "msg": "Question Added successfully",
                             "payload": data
                         });
                     }
@@ -60,18 +51,17 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
         }
     }
     catch (error) {
-        console.log("<=========================catch -===============>");
         next(error);
     }
 });
-exports.TopicController.put('/update/:id', async (request, response, next) => {
+exports.QuestionsController.put('/update/:id', async (request, response, next) => {
     try {
         const { body } = request;
         const { id } = request.params;
         var ObjectId = require('mongodb').ObjectId;
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
-        await models_1.TopicModel.updateOne(query, body, { upsert: true, useFindAndModify: false }, function (err, result) {
+        await models_1.QuestionModel.updateOne(query, body, { upsert: true, useFindAndModify: false }, function (err, result) {
             if (err) {
                 response.status(404).send({
                     "success": false,
@@ -81,7 +71,7 @@ exports.TopicController.put('/update/:id', async (request, response, next) => {
             else {
                 response.status(200).send({
                     "success": true,
-                    "message": result.nModified == 1 ? "Topic Succefully Updated" : "Something Wrong Please Try Again"
+                    "message": result.nModified == 1 ? "Question Succefully Updated" : "Something Wrong Please Try Again"
                 });
             }
         });
@@ -90,18 +80,18 @@ exports.TopicController.put('/update/:id', async (request, response, next) => {
         next(error);
     }
 });
-exports.TopicController.delete('/delete/:id', async (request, response, next) => {
+exports.QuestionsController.delete('/delete/:id', async (request, response, next) => {
     try {
         const { id } = request.params;
         var ObjectId = require('mongodb').ObjectId;
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
-        await models_1.TopicModel.deleteOne(query).then((val) => {
+        await models_1.QuestionModel.deleteOne(query).then((val) => {
             if (val.deletedCount == 1) {
                 response.status(200).send({
                     "success": [
                         {
-                            "msg": "Topics deleted successfully"
+                            "msg": "Question deleted successfully"
                         }
                     ]
                 });
@@ -121,18 +111,18 @@ exports.TopicController.delete('/delete/:id', async (request, response, next) =>
         next(error);
     }
 });
-exports.TopicController.get('/get/:id', async (request, response, next) => {
+exports.QuestionsController.get('/get/:id', async (request, response, next) => {
     try {
         const { id } = request.params;
         var ObjectId = require('mongodb').ObjectId;
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
-        await models_1.TopicModel.findOne(query).then((val) => {
+        await models_1.QuestionModel.findOne(query).then((val) => {
             if (val) {
                 response.status(200).send({
                     "success": [
                         {
-                            "msg": "Topics details successfully",
+                            "msg": "Question details successfully",
                             "data": val
                         }
                     ]
@@ -142,7 +132,7 @@ exports.TopicController.get('/get/:id', async (request, response, next) => {
                 response.status(404).send({
                     "error": [
                         {
-                            "msg": "Oops! topic not found."
+                            "msg": "Oops! question not found."
                         }
                     ]
                 });
@@ -153,39 +143,21 @@ exports.TopicController.get('/get/:id', async (request, response, next) => {
         next(error);
     }
 });
-exports.TopicController.put('/', async (request, response, next) => {
+exports.QuestionsController.get('/', async (request, response, next) => {
     try {
-        const { limit, page } = request.body;
-        const count = await models_1.TopicModel.count();
-        console.log("limit>>>>>", limit * 1);
-        console.log("skip>>>>", (page - 1) * limit);
-        await models_1.TopicModel.aggregate([
-            {
-                $lookup: {
-                    from: "topics",
-                    localField: "parent_id",
-                    foreignField: "_id",
-                    as: "parentDetails"
-                }
-            }
-        ])
-            .limit(limit)
-            .skip((page - 1) * limit)
-            .sort({ createdAt: -1 })
+        await models_1.QuestionModel.find()
             .then((val) => {
             if (val) {
                 response.status(200).send({
                     "status": "SUCCESS",
-                    "msg": "Topics details successfully",
-                    "payload": val,
-                    "totalPages": Math.ceil(count / limit),
-                    "currentPage": page
+                    "msg": "Question details successfully",
+                    "payload": val
                 });
             }
             else {
                 response.status(404).send({
                     "status": "ERROR",
-                    "msg": "Oops! topic not found.",
+                    "msg": "Oops! question not found.",
                     "payload": []
                 });
             }
@@ -195,4 +167,4 @@ exports.TopicController.put('/', async (request, response, next) => {
         next(error);
     }
 });
-//# sourceMappingURL=topic.js.map
+//# sourceMappingURL=questions.js.map

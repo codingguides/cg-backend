@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { TopicModel } from "../models";
 import { check, body, validationResult } from 'express-validator';
-// import { Authguard } from "../guards";
+
 
 
 export const TopicController = Router();
@@ -73,7 +73,7 @@ TopicController.post('/add',
 
       next(error)
     }
-  });
+});
 
 TopicController.put('/update/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -91,6 +91,7 @@ TopicController.put('/update/:id', async (request: Request, response: Response, 
       function (err, result) {
         if (err) {
           response.status(404).send({
+            "success": false,
             "error": err,
           });
         } else {
@@ -176,8 +177,13 @@ TopicController.get('/get/:id', async (request: Request, response: Response, nex
   }
 });
 
-TopicController.get('/', async (request: Request, response: Response, next: NextFunction) => {
+TopicController.put('/', async (request: Request, response: Response, next: NextFunction) => {
   try {
+
+    const { limit, page } = request.body;
+    const count = await TopicModel.count();
+    console.log("limit>>>>>",limit * 1)
+    console.log("skip>>>>",(page - 1) * limit)
 
     await TopicModel.aggregate([
       {
@@ -189,13 +195,16 @@ TopicController.get('/', async (request: Request, response: Response, next: Next
         }
       }
     ])
-      // await TopicModel.find()
-      .then((val) => {
+     .limit(limit) //10 | 
+     .skip((page - 1) * limit) //0
+    .then((val) => {
         if (val) {
           response.status(200).send({
             "status": "SUCCESS",
             "msg": "Topics details successfully",
-            "payload": val
+            "payload": val,
+            "totalPages": Math.ceil(count / limit),
+            "currentPage": page
           });
         } else {
           response.status(404).send({

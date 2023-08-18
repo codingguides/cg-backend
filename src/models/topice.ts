@@ -1,4 +1,6 @@
 import { Schema, model } from "mongoose";
+const mongoosePaginate = require('mongoose-paginate');
+
 const TopicSchema = new Schema({
     name: {
         type: String,
@@ -19,5 +21,7 @@ const TopicSchema = new Schema({
     }
 
 }, { timestamps: true });
+
+TopicSchema.plugin(mongoosePaginate);
 
 export const TopicModel = model("topics", TopicSchema);

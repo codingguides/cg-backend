@@ -27,4 +27,4 @@ const QuestionSchema = new mongoose_1.Schema({
     }
 }, { timestamps: true });
 exports.QuestionModel = (0, mongoose_1.model)("questions", QuestionSchema);
-//# sourceMappingURL=question.js.map
+//# sourceMappingURL=questions.js.map

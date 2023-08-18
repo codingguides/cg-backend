@@ -17,14 +17,23 @@ TagsController.post('/add',
       return response.status(400).json({ errors: errors.array() });
     } else {
       const { body } = request;
-
+      let queryOBJ ={}
+      if(body.type == "questions"){
+        queryOBJ ={
+          name: (body.name).trim(),
+          type: body.type,
+          questions_id: ObjectId(body.questions_id)
+        }
+      }else{
+        queryOBJ ={
+          name: (body.name).trim(),
+          type: body.type,
+          topic_id: ObjectId(body.topic_id)
+        }
+      }
+      console.log("queryOBJ>>>>>>>",queryOBJ)
       await TagsModel.syncIndexes();
-      let tagData = new TagsModel({
-        name: body.name,
-        type: body.type,
-        topic_id: ObjectId(body.topic_id),
-        question_id: ObjectId(body.question_id)
-      });
+      let tagData = new TagsModel(queryOBJ);
       tagData.save(
         function (err, data) {
           if (data) {

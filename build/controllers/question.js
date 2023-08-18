@@ -5,7 +5,7 @@ const express_1 = require("express");
 const models_1 = require("../models");
 const express_validator_1 = require("express-validator");
 exports.QuestionController = (0, express_1.Router)();
-exports.QuestionController.post('/add', (0, express_validator_1.check)('question').not().isEmpty().withMessage('Question is required'), (0, express_validator_1.check)('options').not().isEmpty().withMessage('options is required'), (0, express_validator_1.check)('rightoption').not().isEmpty().withMessage('rightoption is required'), (0, express_validator_1.check)('type').not().isEmpty().withMessage('type is required'), (0, express_validator_1.check)('questiontype').not().isEmpty().withMessage('questiontype is required'), (0, express_validator_1.check)('topic_id').not().isEmpty().withMessage('topic_id is required'), async (request, response, next) => {
+exports.QuestionController.post('/add', (0, express_validator_1.check)('question').not().isEmpty().withMessage('Question is required'), (0, express_validator_1.check)('options').not().isEmpty().withMessage('options is required'), (0, express_validator_1.check)('rightoption').not().isEmpty().withMessage('rightoption is required'), (0, express_validator_1.check)('type').not().isEmpty().withMessage('type is required'), (0, express_validator_1.check)('questiontype').not().isEmpty().withMessage('questiontype is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), async (request, response, next) => {
     try {
         const errors = (0, express_validator_1.validationResult)(request);
         if (!errors.isEmpty()) {
@@ -29,7 +29,7 @@ exports.QuestionController.post('/add', (0, express_validator_1.check)('question
                     point: body.point,
                     type: body.type,
                     questiontype: body.questiontype,
-                    topic_id: body.topic_id
+                    user_id: body.user_id
                 });
                 QuestionData.save(function (err, data) {
                     if (data) {

@@ -15,13 +15,24 @@ exports.TagsController.post('/add', (0, express_validator_1.check)('name').not()
         }
         else {
             const { body } = request;
+            let queryOBJ = {};
+            if (body.type == "questions") {
+                queryOBJ = {
+                    name: (body.name).trim(),
+                    type: body.type,
+                    questions_id: ObjectId(body.questions_id)
+                };
+            }
+            else {
+                queryOBJ = {
+                    name: (body.name).trim(),
+                    type: body.type,
+                    topic_id: ObjectId(body.topic_id)
+                };
+            }
+            console.log("queryOBJ>>>>>>>", queryOBJ);
             await models_1.TagsModel.syncIndexes();
-            let tagData = new models_1.TagsModel({
-                name: body.name,
-                type: body.type,
-                topic_id: ObjectId(body.topic_id),
-                question_id: ObjectId(body.question_id)
-            });
+            let tagData = new models_1.TagsModel(queryOBJ);
             tagData.save(function (err, data) {
                 if (data) {
                     response.status(200).send({
