@@ -18,14 +18,14 @@ exports.TagsController.post('/add', (0, express_validator_1.check)('name').not()
             let queryOBJ = {};
             if (body.type == "questions") {
                 queryOBJ = {
-                    name: (body.name).trim(),
+                    name: (body.name).trim().toUpperCase(),
                     type: body.type,
                     questions_id: ObjectId(body.questions_id)
                 };
             }
             else {
                 queryOBJ = {
-                    name: (body.name).trim(),
+                    name: (body.name).trim().toUpperCase(),
                     type: body.type,
                     topic_id: ObjectId(body.topic_id)
                 };

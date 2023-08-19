@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { TopicModel } from "../models";
+import { TagsModel, TopicModel } from "../models";
 import { check, body, validationResult } from 'express-validator';
 
 
@@ -145,8 +145,6 @@ TopicController.get('/get/:id', async (request: Request, response: Response, nex
     var ObjectId = require('mongodb').ObjectId;
     var _id = new ObjectId(id);
 
-    const query = { _id: ObjectId(_id) };
-
     await TopicModel.aggregate([
       {
         $match: { _id: ObjectId(_id) }
@@ -183,21 +181,106 @@ TopicController.get('/get/:id', async (request: Request, response: Response, nex
 TopicController.put('/', async (request: Request, response: Response, next: NextFunction) => {
   try {
 
-    const { limit, page } = request.body;
+    const { limit, page, type, search } = request.body;
     const count = await TopicModel.count();
     console.log("limit>>>>>",limit * 1)
     console.log("skip>>>>",(page - 1) * limit)
-
-    await TopicModel.aggregate([
-      {
-        $lookup: {
-          from: "topics",
-          localField: "parent_id",
-          foreignField: "_id",
-          as: "parentDetails"
-        }
+    console.log(type,"><><><><><>",search)
+    let tags = [];
+    let query = []
+    if(type == "Tag"){
+      console.log("under if")
+      await TagsModel.find({"type": "Topic","name": search.toUpperCase()},{"topic_id":1,"_id":0}).then(async (res)=>{
+        await res.map((tag)=>{
+          tags.push(tag.topic_id)
+        })
+      })
+      if(tags){
+        query = [
+          { $match:{ _id : { $in: tags } }} ,
+          {
+            $lookup: {
+              from: "topics",
+              localField: "parent_id",
+              foreignField: "_id",
+              as: "parentDetails"
+            },
+          },
+          {
+            $lookup: {
+              from: "tags",
+              localField: "_id",
+              foreignField: "topic_id",
+              as: "tags"
+            }
+          }
+        ]
       }
-    ])
+      console.log("tags>>>>>",tags)
+    }else if(type == "Topic"){
+      query = [
+        { $match:{ name : {'$regex' : search, '$options' : 'i'} }},
+        {
+          $lookup: {
+            from: "topics",
+            localField: "parent_id",
+            foreignField: "_id",
+            as: "parentDetails"
+          },
+        },
+        {
+          $lookup: {
+            from: "tags",
+            localField: "_id",
+            foreignField: "topic_id",
+            as: "tags"
+          }
+        }
+      ]
+    }else if(type == "Slug"){
+      query = [
+        { $match:{ slug : {'$regex' : search, '$options' : 'i'} }},
+        {
+          $lookup: {
+            from: "topics",
+            localField: "parent_id",
+            foreignField: "_id",
+            as: "parentDetails"
+          },
+        },
+        {
+          $lookup: {
+            from: "tags",
+            localField: "_id",
+            foreignField: "topic_id",
+            as: "tags"
+          }
+        }
+      ]
+    }else {
+      query = [
+        {
+          $lookup: {
+            from: "topics",
+            localField: "parent_id",
+            foreignField: "_id",
+            as: "parentDetails"
+          },
+        },
+        {
+          $lookup: {
+            from: "tags",
+            localField: "_id",
+            foreignField: "topic_id",
+            as: "tags"
+          }
+        }
+      ]
+    }
+
+    console.log("query>>>>>>>>",query)
+
+    await TopicModel.aggregate(query)
      .limit(limit) //10 | 
      .skip((page - 1) * limit) //0
     .then((val) => {
@@ -216,9 +299,7 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
             "payload": []
           });
         }
-
       })
-
   } catch (error) {
     next(error)
   }
