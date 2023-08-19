@@ -26,21 +26,25 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
                 });
             }
             else {
-                let topicData = new models_1.TopicModel({
-                    name: body.name,
-                    description: body.description,
-                    slug: body.slug,
-                    user_id: ObjectId(body.user_id),
-                    parent_id: ObjectId(body.parent_id)
-                });
-                console.log({
-                    name: body.name,
-                    description: body.description,
-                    slug: body.slug,
-                    user_id: body.user_id,
-                    parent_id: ObjectId(body.parent_id)
-                });
-                topicData.save(function (err, data) {
+                let topicData = {};
+                if (body.parent_id == 0) {
+                    topicData = {
+                        name: body.name,
+                        description: body.description,
+                        slug: body.slug,
+                        user_id: ObjectId(body.user_id)
+                    };
+                }
+                else {
+                    topicData = {
+                        name: body.name,
+                        description: body.description,
+                        slug: body.slug,
+                        user_id: ObjectId(body.user_id),
+                        parent_id: ObjectId(body.parent_id)
+                    };
+                }
+                new models_1.TopicModel(topicData).save(function (err, data) {
                     if (data) {
                         response.status(200).send({
                             "status": "SUCCESS",
@@ -72,16 +76,17 @@ exports.TopicController.put('/update/:id', async (request, response, next) => {
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
         await models_1.TopicModel.updateOne(query, body, { upsert: true, useFindAndModify: false }, function (err, result) {
-            if (err) {
-                response.status(404).send({
-                    "success": false,
-                    "error": err,
+            if (result) {
+                response.status(200).send({
+                    "status": "SUCCESS",
+                    "msg": result.nModified == 1 ? "Topic Succefully Updated" : "Something Wrong Please Try Again"
                 });
             }
             else {
-                response.status(200).send({
-                    "success": true,
-                    "message": result.nModified == 1 ? "Topic Succefully Updated" : "Something Wrong Please Try Again"
+                response.status(404).send({
+                    "status": "ERROR",
+                    "msg": "Oops! topic not found.",
+                    err
                 });
             }
         });
@@ -99,20 +104,14 @@ exports.TopicController.delete('/delete/:id', async (request, response, next) =>
         await models_1.TopicModel.deleteOne(query).then((val) => {
             if (val.deletedCount == 1) {
                 response.status(200).send({
-                    "success": [
-                        {
-                            "msg": "Topics deleted successfully"
-                        }
-                    ]
+                    "status": "SUCCESS",
+                    "msg": "Topics deleted successfully"
                 });
             }
             else {
                 response.status(404).send({
-                    "error": [
-                        {
-                            "msg": "Oops! something wrong, please try again"
-                        }
-                    ]
+                    "status": "ERROR",
+                    "msg": "Oops! something wrong, please try again"
                 });
             }
         });
@@ -127,24 +126,31 @@ exports.TopicController.get('/get/:id', async (request, response, next) => {
         var ObjectId = require('mongodb').ObjectId;
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
-        await models_1.TopicModel.findOne(query).then((val) => {
+        await models_1.TopicModel.aggregate([
+            {
+                $match: { _id: ObjectId(_id) }
+            },
+            {
+                $lookup: {
+                    from: "tags",
+                    localField: "_id",
+                    foreignField: "topic_id",
+                    as: "tags"
+                }
+            }
+        ])
+            .then((val) => {
             if (val) {
                 response.status(200).send({
-                    "success": [
-                        {
-                            "msg": "Topics details successfully",
-                            "data": val
-                        }
-                    ]
+                    "status": "SUCCESS",
+                    "msg": "Topics details successfully",
+                    "payload": val
                 });
             }
             else {
                 response.status(404).send({
-                    "error": [
-                        {
-                            "msg": "Oops! topic not found."
-                        }
-                    ]
+                    "status": "ERROR",
+                    "msg": "Oops! topic not found."
                 });
             }
         });
@@ -169,9 +175,8 @@ exports.TopicController.put('/', async (request, response, next) => {
                 }
             }
         ])
-            .limit(limit)
-            .skip((page - 1) * limit)
-            .sort({ createdAt: -1 })
+            .limit(limit) //10 | 
+            .skip((page - 1) * limit) //0
             .then((val) => {
             if (val) {
                 response.status(200).send({
@@ -187,6 +192,28 @@ exports.TopicController.put('/', async (request, response, next) => {
                     "status": "ERROR",
                     "msg": "Oops! topic not found.",
                     "payload": []
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.TopicController.get('/list', async (request, response, next) => {
+    try {
+        await models_1.TopicModel.find().then((val) => {
+            if (val) {
+                response.status(200).send({
+                    "status": "SUCCESS",
+                    "msg": "Topics details successfully",
+                    "payload": val
+                });
+            }
+            else {
+                response.status(404).send({
+                    "status": "ERROR",
+                    "msg": "Oops! topic not found."
                 });
             }
         });

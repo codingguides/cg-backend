@@ -64,20 +64,14 @@ exports.TagsController.delete('/delete/:id', async (request, response, next) => 
         await models_1.TagsModel.deleteOne(query).then((val) => {
             if (val.deletedCount == 1) {
                 response.status(200).send({
-                    "success": [
-                        {
-                            "msg": "Tags deleted successfully"
-                        }
-                    ]
+                    "status": "SUCCESS",
+                    "msg": "Tags deleted successfully"
                 });
             }
             else {
                 response.status(404).send({
-                    "error": [
-                        {
-                            "msg": "Oops! something wrong, please try again"
-                        }
-                    ]
+                    "status": "ERROR",
+                    "msg": "Oops! something wrong, please try again"
                 });
             }
         });

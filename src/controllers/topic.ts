@@ -33,22 +33,25 @@ TopicController.post('/add',
           });
         } else {
 
-          let topicData = new TopicModel({
-            name: body.name,
-            description: body.description,
-            slug: body.slug,
-            user_id: ObjectId(body.user_id),
-            parent_id: ObjectId(body.parent_id)
-          });
+          let topicData = {}
+          if(body.parent_id == 0){
+            topicData = {
+              name: body.name,
+              description: body.description,
+              slug: body.slug,
+              user_id: ObjectId(body.user_id)
+            }
+          }else{
+            topicData = {
+              name: body.name,
+              description: body.description,
+              slug: body.slug,
+              user_id: ObjectId(body.user_id),
+              parent_id: ObjectId(body.parent_id)
+            }
+          }
 
-          console.log({
-            name: body.name,
-            description: body.description,
-            slug: body.slug,
-            user_id: body.user_id,
-            parent_id: ObjectId(body.parent_id)
-          })
-          topicData.save(
+          new TopicModel(topicData).save(
             function (err, data) {
               if (data) {
                 response.status(200).send({
@@ -89,15 +92,16 @@ TopicController.put('/update/:id', async (request: Request, response: Response, 
       body,
       { upsert: true, useFindAndModify: false },
       function (err, result) {
-        if (err) {
-          response.status(404).send({
-            "success": false,
-            "error": err,
+        if (result) {
+          response.status(200).send({
+            "status": "SUCCESS",
+            "msg": result.nModified == 1 ? "Topic Succefully Updated" : "Something Wrong Please Try Again"
           });
         } else {
-          response.status(200).send({
-            "success": true,
-            "message": result.nModified == 1 ? "Topic Succefully Updated" : "Something Wrong Please Try Again"
+          response.status(404).send({
+            "status": "ERROR",
+            "msg": "Oops! topic not found.",
+            err
           });
         }
       }
@@ -119,22 +123,15 @@ TopicController.delete('/delete/:id', async (request: Request, response: Respons
     await TopicModel.deleteOne(query).then((val) => {
       if (val.deletedCount == 1) {
         response.status(200).send({
-          "success": [
-            {
-              "msg": "Topics deleted successfully"
-            }
-          ]
+          "status": "SUCCESS",
+          "msg": "Topics deleted successfully"
         });
       } else {
         response.status(404).send({
-          "error": [
-            {
-              "msg": "Oops! something wrong, please try again"
-            }
-          ]
+          "status": "ERROR",
+          "msg": "Oops! something wrong, please try again"
         });
       }
-
     })
 
   } catch (error) {
@@ -150,26 +147,32 @@ TopicController.get('/get/:id', async (request: Request, response: Response, nex
 
     const query = { _id: ObjectId(_id) };
 
-    await TopicModel.findOne(query).then((val) => {
+    await TopicModel.aggregate([
+      {
+        $match: { _id: ObjectId(_id) }
+      },
+      {
+        $lookup: {
+          from: "tags",
+          localField: "_id",
+          foreignField: "topic_id",
+          as: "tags"
+        }
+      }
+    ])
+    .then((val) => {
       if (val) {
         response.status(200).send({
-          "success": [
-            {
-              "msg": "Topics details successfully",
-              "data": val
-            }
-          ]
+          "status": "SUCCESS",
+          "msg": "Topics details successfully",
+          "payload": val
         });
       } else {
         response.status(404).send({
-          "error": [
-            {
-              "msg": "Oops! topic not found."
-            }
-          ]
+          "status": "ERROR",
+          "msg": "Oops! topic not found."
         });
       }
-
     })
 
   } catch (error) {
@@ -215,6 +218,30 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
         }
 
       })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
+TopicController.get('/list', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+
+    await TopicModel.find().then((val) => {
+      if (val) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Topics details successfully",
+          "payload": val
+        });
+      } else {
+        response.status(404).send({
+          "status": "ERROR",
+          "msg": "Oops! topic not found."
+        });
+      }
+
+    })
 
   } catch (error) {
     next(error)
