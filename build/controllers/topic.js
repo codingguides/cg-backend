@@ -167,14 +167,15 @@ exports.TopicController.put('/', async (request, response, next) => {
         console.log(type, "><><><><><>", search);
         let tags = [];
         let query = [];
-        if (type == "Tag") {
+        if (type === "Tag") {
             console.log("under if");
-            await models_1.TagsModel.find({ "type": "Topic", "name": search.toUpperCase() }, { "topic_id": 1, "_id": 0 }).then(async (res) => {
+            await models_1.TagsModel.find({ "type": "topic", "name": search.toUpperCase() }, { "topic_id": 1, "_id": 0 }).then(async (res) => {
                 await res.map((tag) => {
                     tags.push(tag.topic_id);
                 });
             });
-            if (tags) {
+            if (tags.length > 0) {
+                console.log("tags>>>>>>>>>>", tags);
                 query = [
                     { $match: { _id: { $in: tags } } },
                     {
@@ -195,9 +196,17 @@ exports.TopicController.put('/', async (request, response, next) => {
                     }
                 ];
             }
+            else {
+                console.log("else tags");
+                throw response.status(200).send({
+                    "status": "ERROR",
+                    "msg": "Oops! topic not found.",
+                    "payload": []
+                });
+            }
             console.log("tags>>>>>", tags);
         }
-        else if (type == "Topic") {
+        else if (type === "Topic") {
             query = [
                 { $match: { name: { '$regex': search, '$options': 'i' } } },
                 {
@@ -218,7 +227,7 @@ exports.TopicController.put('/', async (request, response, next) => {
                 }
             ];
         }
-        else if (type == "Slug") {
+        else if (type === "Slug") {
             query = [
                 { $match: { slug: { '$regex': search, '$options': 'i' } } },
                 {
