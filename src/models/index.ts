@@ -4,3 +4,4 @@ export * from "./metatags";
 export * from "./questions";
 export * from "./tags";
 export * from "./topice";
+export * from "./relationshipTopicQuestion";

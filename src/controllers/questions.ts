@@ -65,8 +65,6 @@ QuestionsController.post('/add',
   }
 });
 
-
-
 QuestionsController.put('/update/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { body } = request;
@@ -194,5 +192,6 @@ QuestionsController.get('/', async (request: Request, response: Response, next: 
     next(error)
   }
 });
+
 
 
