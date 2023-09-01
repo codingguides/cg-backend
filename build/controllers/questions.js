@@ -62,16 +62,17 @@ exports.QuestionsController.put('/update/:id', async (request, response, next) =
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
         await models_1.QuestionModel.updateOne(query, body, { upsert: true, useFindAndModify: false }, function (err, result) {
-            if (err) {
-                response.status(404).send({
-                    "success": false,
-                    "error": err,
+            if (result) {
+                response.status(200).send({
+                    "status": "SUCCESS",
+                    "msg": result.nModified == 1 ? "Question Succefully Updated" : "Something Wrong Please Try Again"
                 });
             }
             else {
-                response.status(200).send({
-                    "success": true,
-                    "message": result.nModified == 1 ? "Question Succefully Updated" : "Something Wrong Please Try Again"
+                response.status(404).send({
+                    "status": "ERROR",
+                    "msg": "Oops! Question not found.",
+                    err
                 });
             }
         });
@@ -89,20 +90,14 @@ exports.QuestionsController.delete('/delete/:id', async (request, response, next
         await models_1.QuestionModel.deleteOne(query).then((val) => {
             if (val.deletedCount == 1) {
                 response.status(200).send({
-                    "success": [
-                        {
-                            "msg": "Question deleted successfully"
-                        }
-                    ]
+                    "status": "SUCCESS",
+                    "msg": "Question deleted successfully"
                 });
             }
             else {
                 response.status(404).send({
-                    "error": [
-                        {
-                            "msg": "Oops! something wrong, please try again"
-                        }
-                    ]
+                    "status": "ERROR",
+                    "msg": "Oops! something wrong, please try again"
                 });
             }
         });
@@ -120,21 +115,15 @@ exports.QuestionsController.get('/get/:id', async (request, response, next) => {
         await models_1.QuestionModel.findOne(query).then((val) => {
             if (val) {
                 response.status(200).send({
-                    "success": [
-                        {
-                            "msg": "Question details successfully",
-                            "data": val
-                        }
-                    ]
+                    "status": "SUCCESS",
+                    "msg": "Question details successfully",
+                    "payload": val
                 });
             }
             else {
                 response.status(404).send({
-                    "error": [
-                        {
-                            "msg": "Oops! question not found."
-                        }
-                    ]
+                    "status": "ERROR",
+                    "msg": "Oops! question not found."
                 });
             }
         });

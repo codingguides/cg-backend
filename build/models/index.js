@@ -20,4 +20,5 @@ __exportStar(require("./metatags"), exports);
 __exportStar(require("./questions"), exports);
 __exportStar(require("./tags"), exports);
 __exportStar(require("./topice"), exports);
+__exportStar(require("./relationshipTopicQuestion"), exports);
 //# sourceMappingURL=index.js.map
