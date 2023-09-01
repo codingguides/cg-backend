@@ -79,15 +79,16 @@ QuestionsController.put('/update/:id', async (request: Request, response: Respon
       body,
       { upsert: true, useFindAndModify: false },
       function (err, result) {
-        if (err) {
-          response.status(404).send({
-            "success": false,
-            "error": err,
+        if (result) {
+          response.status(200).send({
+            "status": "SUCCESS",
+            "msg": result.nModified == 1 ? "Question Succefully Updated" : "Something Wrong Please Try Again"
           });
         } else {
-          response.status(200).send({
-            "success": true,
-            "message": result.nModified == 1 ? "Question Succefully Updated" : "Something Wrong Please Try Again"
+          response.status(404).send({
+            "status": "ERROR",
+            "msg": "Oops! Question not found.",
+            err
           });
         }
       }
@@ -109,19 +110,15 @@ QuestionsController.delete('/delete/:id', async (request: Request, response: Res
     await QuestionModel.deleteOne(query).then((val) => {
       if (val.deletedCount == 1) {
         response.status(200).send({
-          "success": [
-            {
+              "status": "SUCCESS",
               "msg": "Question deleted successfully"
-            }
-          ]
+            
         });
       } else {
         response.status(404).send({
-          "error": [
-            {
+              "status":"ERROR",
               "msg": "Oops! something wrong, please try again"
-            }
-          ]
+           
         });
       }
 
@@ -143,20 +140,16 @@ QuestionsController.get('/get/:id', async (request: Request, response: Response,
     await QuestionModel.findOne(query).then((val) => {
       if (val) {
         response.status(200).send({
-          "success": [
-            {
+              "status": "SUCCESS",
               "msg": "Question details successfully",
-              "data": val
-            }
-          ]
+              "payload": val
+          
         });
       } else {
         response.status(404).send({
-          "error": [
-            {
+              "status":"ERROR",
               "msg": "Oops! question not found."
-            }
-          ]
+          
         });
       }
 
