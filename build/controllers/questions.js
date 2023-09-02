@@ -132,21 +132,38 @@ exports.QuestionsController.get('/get/:id', async (request, response, next) => {
         next(error);
     }
 });
-exports.QuestionsController.get('/', async (request, response, next) => {
+exports.QuestionsController.put('/', async (request, response, next) => {
     try {
-        await models_1.QuestionModel.find()
+        const { limit, page, level, search } = request.body;
+        const count = await models_1.QuestionModel.count();
+        let query = [];
+        if (search && level == "") {
+            query = [{ $match: { question: { '$regex': search, '$options': 'i' } } }];
+        }
+        else if (level && search == "") {
+            query = [{ $match: { level: level } }];
+        }
+        else if (search && level) {
+            query = [{ $match: { question: { '$regex': search, '$options': 'i' }, level: level } }];
+        }
+        console.log("query>>>>>>>", query);
+        await models_1.QuestionModel.aggregate(query)
+            .limit(limit)
+            .skip((page - 1) * limit)
             .then((val) => {
             if (val) {
                 response.status(200).send({
                     "status": "SUCCESS",
                     "msg": "Question details successfully",
-                    "payload": val
+                    "payload": val,
+                    "totalPages": Math.ceil(count / limit),
+                    "currentPage": page
                 });
             }
             else {
                 response.status(404).send({
                     "status": "ERROR",
-                    "msg": "Oops! question not found.",
+                    "msg": "Oops! topic not found.",
                     "payload": []
                 });
             }
