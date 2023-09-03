@@ -1,13 +1,13 @@
 import { Schema, model } from "mongoose";
-const RelationshipTopicQuestionSchema = new Schema({
+const relationSchema = new Schema({
     topic_id: {
         type: Schema.Types.ObjectId,
         ref: 'Topics'
     },
-    questions_id: {
+    question_id: {
         type: Schema.Types.ObjectId,
         ref: 'Questions'
     }
 }, { timestamps: true });
 
-export const RelationshipTopicQuestionModel = model("relationshiptopicquestion", RelationshipTopicQuestionSchema);
+export const RelationModel = model("relation", relationSchema);

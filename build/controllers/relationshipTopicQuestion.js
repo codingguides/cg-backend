@@ -28,7 +28,7 @@ exports.RelationshipTopicQuestionController.post('/add', (0, express_validator_1
                     });
                 }
                 else {
-                    response.status(404).send({
+                    response.status(200).send({
                         "status": "ERROR",
                         "msg": "Oops! something wrong",
                         err
