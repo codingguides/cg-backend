@@ -160,11 +160,8 @@ exports.TopicController.get('/get/:id', async (request, response, next) => {
 });
 exports.TopicController.put('/', async (request, response, next) => {
     try {
-        const { limit, page, type, search } = request.body;
+        const { limit = 10, page = 1, type, search } = request.body;
         const count = await models_1.TopicModel.count();
-        console.log("limit>>>>>", limit * 1);
-        console.log("skip>>>>", (page - 1) * limit);
-        console.log(type, "><><><><><>", search);
         let tags = [];
         let query = [];
         if (type === "Tag") {
@@ -270,8 +267,8 @@ exports.TopicController.put('/', async (request, response, next) => {
         }
         console.log("query>>>>>>>>", query);
         await models_1.TopicModel.aggregate(query)
-            .limit(limit) //10 | 
-            .skip((page - 1) * limit) //0
+            .skip((page - 1) * limit)
+            .limit(limit * 1)
             .then((val) => {
             if (val) {
                 response.status(200).send({

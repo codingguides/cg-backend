@@ -181,11 +181,10 @@ TopicController.get('/get/:id', async (request: Request, response: Response, nex
 TopicController.put('/', async (request: Request, response: Response, next: NextFunction) => {
   try {
 
-    const { limit, page, type, search } = request.body;
+    const { limit = 2, page = 1, type, search } = request.body;
     const count = await TopicModel.count();
-    console.log("limit>>>>>",limit * 1)
-    console.log("skip>>>>",(page - 1) * limit)
-    console.log(type,"><><><><><>",search)
+  
+
     let tags = [];
     let query = []
     if(type === "Tag"){
@@ -290,8 +289,8 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
     console.log("query>>>>>>>>",query)
 
     await TopicModel.aggregate(query)
-     .limit(limit) //10 | 
-     .skip((page - 1) * limit) //0
+    .skip((page - 1) * limit)
+    .limit(limit * 1)
     .then((val) => {
         if (val) {
           response.status(200).send({
