@@ -5,15 +5,19 @@ const TagsSchema = new Schema({
     },
     type: {
         type:String,
-        enum: ["topic", "questions"],
+        enum: ["topic", "questions","blog"],
     },
     topic_id: {
         type: Schema.Types.ObjectId,
         ref: 'Topics'
     },
-    questions_id: {
+    question_id: {
         type: Schema.Types.ObjectId,
         ref: 'Questions'
+    },
+    blog_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Blogs'
     }
 }, { timestamps: true });
 

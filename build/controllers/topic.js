@@ -160,7 +160,7 @@ exports.TopicController.get('/get/:id', async (request, response, next) => {
 });
 exports.TopicController.put('/', async (request, response, next) => {
     try {
-        const { limit = 10, page = 1, type, search } = request.body;
+        const { limit = 2, page = 1, type, search } = request.body;
         const count = await models_1.TopicModel.count();
         let tags = [];
         let query = [];

@@ -7,6 +7,10 @@ const relationSchema = new Schema({
     question_id: {
         type: Schema.Types.ObjectId,
         ref: 'Questions'
+    },
+    blog_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Blogs'
     }
 }, { timestamps: true });
 

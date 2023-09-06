@@ -18,20 +18,27 @@ TagsController.post('/add',
     } else {
       const { body } = request;
       let queryOBJ ={}
-      if(body.type == "questions"){
+      
+      if(body.type == "question"){
         queryOBJ ={
           name: (body.name).trim().toUpperCase(),
           type: body.type,
           questions_id: ObjectId(body.questions_id)
         }
-      }else{
+      }else if(body.type == "topic"){
         queryOBJ ={
           name: (body.name).trim().toUpperCase(),
           type: body.type,
           topic_id: ObjectId(body.topic_id)
         }
+      }else if(body.type == "blog"){
+        queryOBJ ={
+          name: (body.name).trim().toUpperCase(),
+          type: body.type,
+          blog_id: ObjectId(body.blog_id)
+        }
       }
-      console.log("queryOBJ>>>>>>>",queryOBJ)
+
       await TagsModel.syncIndexes();
       let tagData = new TagsModel(queryOBJ);
       tagData.save(

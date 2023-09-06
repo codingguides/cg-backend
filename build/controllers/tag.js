@@ -16,21 +16,27 @@ exports.TagsController.post('/add', (0, express_validator_1.check)('name').not()
         else {
             const { body } = request;
             let queryOBJ = {};
-            if (body.type == "questions") {
+            if (body.type == "question") {
                 queryOBJ = {
                     name: (body.name).trim().toUpperCase(),
                     type: body.type,
                     questions_id: ObjectId(body.questions_id)
                 };
             }
-            else {
+            else if (body.type == "topic") {
                 queryOBJ = {
                     name: (body.name).trim().toUpperCase(),
                     type: body.type,
                     topic_id: ObjectId(body.topic_id)
                 };
             }
-            console.log("queryOBJ>>>>>>>", queryOBJ);
+            else if (body.type == "blog") {
+                queryOBJ = {
+                    name: (body.name).trim().toUpperCase(),
+                    type: body.type,
+                    blog_id: ObjectId(body.blog_id)
+                };
+            }
             await models_1.TagsModel.syncIndexes();
             let tagData = new models_1.TagsModel(queryOBJ);
             tagData.save(function (err, data) {
