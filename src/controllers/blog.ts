@@ -6,7 +6,6 @@ export const BlogController = Router();
 
 BlogController.post(
   "/add",
-
   check("title").not().isEmpty().withMessage("Title is required"),
   check("slug").not().isEmpty().withMessage("Slug is required"),
   check("description").not().isEmpty().withMessage("Description is required"),
@@ -184,3 +183,42 @@ BlogController.get(
     }
   }
 );
+
+BlogController.put('/', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { limit = 3, page = 1, type, search,status } = request.body;
+    const count = await BlogModel.count();
+    let query = []
+
+    if (type == "title") {
+      query = [{ $match: { title: { '$regex': search, '$options': 'i' } } }]
+    } else if (type == "slug") {
+      query = [{ $match: { slug: { '$regex': search, '$options': 'i' } } }]
+    } else if (type == "status") {
+      query = [{ $match: { status: status } }]
+    }
+
+    await BlogModel.aggregate(query)
+      .skip((page - 1) * limit)
+      .limit(limit * 1)
+      .then((val) => {
+        if (val) {
+          response.status(200).send({
+            "status": "SUCCESS",
+            "msg": "Blog details successfully",
+            "payload": val,
+            "totalPages": Math.ceil(count / limit),
+            "currentPage": page
+          });
+        } else {
+          response.status(404).send({
+            "status": "ERROR",
+            "msg": "Oops! blog not found.",
+            "payload": []
+          });
+        }
+      })
+  } catch (error) {
+    next(error)
+  }
+});

@@ -159,4 +159,44 @@ exports.BlogController.get("/", async (request, response, next) => {
         next(error);
     }
 });
+exports.BlogController.put('/', async (request, response, next) => {
+    try {
+        const { limit = 3, page = 1, type, search, status } = request.body;
+        const count = await models_1.BlogModel.count();
+        let query = [];
+        if (type == "title") {
+            query = [{ $match: { title: { '$regex': search, '$options': 'i' } } }];
+        }
+        else if (type == "slug") {
+            query = [{ $match: { slug: { '$regex': search, '$options': 'i' } } }];
+        }
+        else if (type == "status") {
+            query = [{ $match: { status: status } }];
+        }
+        await models_1.BlogModel.aggregate(query)
+            .skip((page - 1) * limit)
+            .limit(limit * 1)
+            .then((val) => {
+            if (val) {
+                response.status(200).send({
+                    "status": "SUCCESS",
+                    "msg": "Blog details successfully",
+                    "payload": val,
+                    "totalPages": Math.ceil(count / limit),
+                    "currentPage": page
+                });
+            }
+            else {
+                response.status(404).send({
+                    "status": "ERROR",
+                    "msg": "Oops! blog not found.",
+                    "payload": []
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 //# sourceMappingURL=blog.js.map
