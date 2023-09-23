@@ -186,7 +186,7 @@ BlogController.get(
 
 BlogController.put('/', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const { limit = 3, page = 1, type, search,status } = request.body;
+    const { limit = 3, page = 1, type, search, status } = request.body;
     const count = await BlogModel.count();
     let query = []
 

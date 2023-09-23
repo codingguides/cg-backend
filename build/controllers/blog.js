@@ -164,15 +164,18 @@ exports.BlogController.put('/', async (request, response, next) => {
         const { limit = 3, page = 1, type, search, status } = request.body;
         const count = await models_1.BlogModel.count();
         let query = [];
-        if (type == "title") {
+        if (search && type == "") {
             query = [{ $match: { title: { '$regex': search, '$options': 'i' } } }];
         }
-        else if (type == "slug") {
-            query = [{ $match: { slug: { '$regex': search, '$options': 'i' } } }];
+        else if (type && search == "") {
+            query = [{ $match: { type: type } }];
         }
-        else if (type == "status") {
-            query = [{ $match: { status: status } }];
+        else if (search && type) {
+            query = [{ $match: { title: { '$regex': search, '$options': 'i' }, type: type } }];
         }
+        // else if (type == "status") {
+        //   query = [{ $match: { status: status } }]
+        // }
         await models_1.BlogModel.aggregate(query)
             .skip((page - 1) * limit)
             .limit(limit * 1)
