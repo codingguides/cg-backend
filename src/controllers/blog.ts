@@ -10,12 +10,9 @@ BlogController.post(
   check("title").not().isEmpty().withMessage("Title is required"),
   check("slug").not().isEmpty().withMessage("Slug is required"),
   check("description").not().isEmpty().withMessage("Description is required"),
-  check("feature_image")
-    .not()
-    .isEmpty()
-    .withMessage("Feature Image is required"),
+  check("feature_image").not().isEmpty().withMessage("Feature Image is required"),
   check("status").not().isEmpty().withMessage("Status is required"),
-  check("question_id").not().isEmpty().withMessage("question_id is required"),
+  // check("question_id").not().isEmpty().withMessage("question_id is required"),
   check("user_id").not().isEmpty().withMessage("user_id is required"),
   async (request: Request, response: Response, next: NextFunction) => {
     try {

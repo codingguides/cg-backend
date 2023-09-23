@@ -14,11 +14,11 @@ const BlogSchema = new Schema({
         enum: ["publish", "draft"],
     },
     question_id: {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'Questions'
     },
     user_id: {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'Users'
     }
 

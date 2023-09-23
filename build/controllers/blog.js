@@ -5,10 +5,9 @@ const express_1 = require("express");
 const models_1 = require("../models");
 const express_validator_1 = require("express-validator");
 exports.BlogController = (0, express_1.Router)();
-exports.BlogController.post("/add", (0, express_validator_1.check)("title").not().isEmpty().withMessage("Title is required"), (0, express_validator_1.check)("slug").not().isEmpty().withMessage("Slug is required"), (0, express_validator_1.check)("description").not().isEmpty().withMessage("Description is required"), (0, express_validator_1.check)("feature_image")
-    .not()
-    .isEmpty()
-    .withMessage("Feature Image is required"), (0, express_validator_1.check)("status").not().isEmpty().withMessage("Status is required"), (0, express_validator_1.check)("question_id").not().isEmpty().withMessage("question_id is required"), (0, express_validator_1.check)("user_id").not().isEmpty().withMessage("user_id is required"), async (request, response, next) => {
+exports.BlogController.post("/add", (0, express_validator_1.check)("title").not().isEmpty().withMessage("Title is required"), (0, express_validator_1.check)("slug").not().isEmpty().withMessage("Slug is required"), (0, express_validator_1.check)("description").not().isEmpty().withMessage("Description is required"), (0, express_validator_1.check)("feature_image").not().isEmpty().withMessage("Feature Image is required"), (0, express_validator_1.check)("status").not().isEmpty().withMessage("Status is required"), 
+// check("question_id").not().isEmpty().withMessage("question_id is required"),
+(0, express_validator_1.check)("user_id").not().isEmpty().withMessage("user_id is required"), async (request, response, next) => {
     try {
         const errors = (0, express_validator_1.validationResult)(request);
         if (!errors.isEmpty()) {
