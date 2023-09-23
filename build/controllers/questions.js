@@ -134,7 +134,7 @@ exports.QuestionsController.get('/get/:id', async (request, response, next) => {
 });
 exports.QuestionsController.put('/', async (request, response, next) => {
     try {
-        const { limit, page, level, search } = request.body;
+        const { limit = 3, page = 1, level, search } = request.body;
         const count = await models_1.QuestionModel.count();
         let query = [];
         if (search && level == "") {
@@ -148,8 +148,8 @@ exports.QuestionsController.put('/', async (request, response, next) => {
         }
         console.log("query>>>>>>>", query);
         await models_1.QuestionModel.aggregate(query)
-            .limit(limit)
             .skip((page - 1) * limit)
+            .limit(limit * 1)
             .then((val) => {
             if (val) {
                 response.status(200).send({
@@ -163,7 +163,7 @@ exports.QuestionsController.put('/', async (request, response, next) => {
             else {
                 response.status(404).send({
                     "status": "ERROR",
-                    "msg": "Oops! topic not found.",
+                    "msg": "Oops! question not found.",
                     "payload": []
                 });
             }
