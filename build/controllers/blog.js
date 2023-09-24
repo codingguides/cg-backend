@@ -164,6 +164,9 @@ exports.BlogController.put('/', async (request, response, next) => {
         const { limit = 3, page = 1, type, search, status } = request.body;
         const count = await models_1.BlogModel.count();
         let query = [];
+        console.log("type>>>>>>>>>>", type);
+        console.log("search>>>>>>>>>>", search);
+        console.log("status>>>>>>>>>>", status);
         if (type == "title") {
             query = [{ $match: { title: { '$regex': search, '$options': 'i' } } }];
         }
@@ -173,6 +176,7 @@ exports.BlogController.put('/', async (request, response, next) => {
         else if (type == "status") {
             query = [{ $match: { status: status } }];
         }
+        console.log("query>>>>>>>>", query);
         await models_1.BlogModel.aggregate(query)
             .skip((page - 1) * limit)
             .limit(limit * 1)
