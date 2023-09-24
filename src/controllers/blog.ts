@@ -190,7 +190,6 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
     const count = await BlogModel.count();
     let query = []
 
-
     if (type == "title") {
       query = [{ $match: { title: { '$regex': search, '$options': 'i' } } }]
     } else if (type == "slug") {
