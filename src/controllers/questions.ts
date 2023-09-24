@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { QuestionModel } from "../models";
+import { QuestionModel, TagsModel } from "../models";
 import { check, body, validationResult } from 'express-validator';
 
 export const QuestionsController = Router();
@@ -162,16 +162,40 @@ QuestionsController.get('/get/:id', async (request: Request, response: Response,
 
 QuestionsController.put('/', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const { limit = 3, page = 1, level, search } = request.body;
+    const { limit = 3, page = 1, level, search, tag } = request.body;
     const count = await QuestionModel.count();
-    let query = []
+    let query = [];
 
-    if (search && level == "") {
-      query = [{ $match: { question: { '$regex': search, '$options': 'i' } } }]
-    } else if (level && search == "") {
-      query = [{ $match: { level: level } }]
-    } else if (search && level) {
-      query = [{ $match: { question: { '$regex': search, '$options': 'i' }, level: level } }]
+    if (tag) {
+      console.log("tag>>>>>>>>>>>>if")
+
+      let tags = [];
+      console.log(tag)
+      await TagsModel.find({ "type": "question", "name": tag.toUpperCase()}).then(async (res) => {
+      console.log("res>>>>>>>>",res)
+
+        await res.map((tag) => {
+          tags.push(tag.question_id)
+        })
+      })
+      console.log("tags>>>>>>>>",tags)
+
+      if (tags.length > 0) {
+        query = [{ $match: { _id: { $in: tags } } }]
+      }
+      console.log("tag query>>>>>>>>>>>>",query)
+      console.log("tags>>>>>>>>>>>>",tags)
+
+    } else {
+
+      if (search && level == "") {
+        query = [{ $match: { question: { '$regex': search, '$options': 'i' } } }]
+      } else if (level && search == "") {
+        query = [{ $match: { level: level } }]
+      } else if (search && level) {
+        query = [{ $match: { question: { '$regex': search, '$options': 'i' }, level: level } }]
+      }
+
     }
     console.log("query>>>>>>>", query)
 
@@ -195,6 +219,8 @@ QuestionsController.put('/', async (request: Request, response: Response, next: 
           });
         }
       })
+
+
   } catch (error) {
     next(error)
   }

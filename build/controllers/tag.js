@@ -20,7 +20,7 @@ exports.TagsController.post('/add', (0, express_validator_1.check)('name').not()
                 queryOBJ = {
                     name: (body.name).trim().toUpperCase(),
                     type: body.type,
-                    questions_id: ObjectId(body.questions_id)
+                    question_id: ObjectId(body.question_id)
                 };
             }
             else if (body.type == "topic") {

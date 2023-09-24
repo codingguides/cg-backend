@@ -5,7 +5,7 @@ const TagsSchema = new Schema({
     },
     type: {
         type:String,
-        enum: ["topic", "questions","blog"],
+        enum: ["topic", "question","blog"],
     },
     topic_id: {
         type: Schema.Types.ObjectId,

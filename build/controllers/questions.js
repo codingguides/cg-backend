@@ -134,17 +134,36 @@ exports.QuestionsController.get('/get/:id', async (request, response, next) => {
 });
 exports.QuestionsController.put('/', async (request, response, next) => {
     try {
-        const { limit = 3, page = 1, level, search } = request.body;
+        const { limit = 3, page = 1, level, search, tag } = request.body;
         const count = await models_1.QuestionModel.count();
         let query = [];
-        if (search && level == "") {
-            query = [{ $match: { question: { '$regex': search, '$options': 'i' } } }];
+        if (tag) {
+            console.log("tag>>>>>>>>>>>>if");
+            let tags = [];
+            console.log(tag);
+            await models_1.TagsModel.find({ "type": "question", "name": tag.toUpperCase() }).then(async (res) => {
+                console.log("res>>>>>>>>", res);
+                await res.map((tag) => {
+                    tags.push(tag.question_id);
+                });
+            });
+            console.log("tags>>>>>>>>", tags);
+            if (tags.length > 0) {
+                query = [{ $match: { _id: { $in: tags } } }];
+            }
+            console.log("tag query>>>>>>>>>>>>", query);
+            console.log("tags>>>>>>>>>>>>", tags);
         }
-        else if (level && search == "") {
-            query = [{ $match: { level: level } }];
-        }
-        else if (search && level) {
-            query = [{ $match: { question: { '$regex': search, '$options': 'i' }, level: level } }];
+        else {
+            if (search && level == "") {
+                query = [{ $match: { question: { '$regex': search, '$options': 'i' } } }];
+            }
+            else if (level && search == "") {
+                query = [{ $match: { level: level } }];
+            }
+            else if (search && level) {
+                query = [{ $match: { question: { '$regex': search, '$options': 'i' }, level: level } }];
+            }
         }
         console.log("query>>>>>>>", query);
         await models_1.QuestionModel.aggregate(query)

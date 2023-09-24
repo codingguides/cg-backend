@@ -8,7 +8,7 @@ const TagsSchema = new mongoose_1.Schema({
     },
     type: {
         type: String,
-        enum: ["topic", "questions", "blog"],
+        enum: ["topic", "question", "blog"],
     },
     topic_id: {
         type: mongoose_1.Schema.Types.ObjectId,

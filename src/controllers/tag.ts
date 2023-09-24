@@ -23,7 +23,7 @@ TagsController.post('/add',
         queryOBJ ={
           name: (body.name).trim().toUpperCase(),
           type: body.type,
-          questions_id: ObjectId(body.questions_id)
+          question_id: ObjectId(body.question_id)
         }
       }else if(body.type == "topic"){
         queryOBJ ={
