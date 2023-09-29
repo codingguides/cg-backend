@@ -20,6 +20,10 @@ const TopicSchema = new mongoose_1.Schema({
     user_id: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Users'
+    },
+    showNav: {
+        type: Boolean,
+        default: 0
     }
 }, { timestamps: true });
 TopicSchema.plugin(mongoosePaginate);

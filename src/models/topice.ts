@@ -18,6 +18,10 @@ const TopicSchema = new Schema({
     user_id: {
         type: Schema.Types.ObjectId, 
         ref: 'Users'
+    },
+    showNav:{
+        type: Boolean,
+        default: 0
     }
 
 }, { timestamps: true });
