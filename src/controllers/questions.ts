@@ -160,6 +160,31 @@ QuestionsController.get('/get/:id', async (request: Request, response: Response,
   }
 });
 
+QuestionsController.get(
+  "/",
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      await QuestionModel.find().then((val) => {
+        if (val) {
+          response.status(200).send({
+            status: "SUCCESS",
+            msg: "Question details successfully",
+            payload: val,
+          });
+        } else {
+          response.status(404).send({
+            status: "ERROR",
+            msg: "Oops! Question not found.",
+            payload: [],
+          });
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 QuestionsController.put('/', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { limit = 3, page = 1, level, search, tag } = request.body;
@@ -171,20 +196,20 @@ QuestionsController.put('/', async (request: Request, response: Response, next: 
 
       let tags = [];
       console.log(tag)
-      await TagsModel.find({ "type": "question", "name": tag.toUpperCase()}).then(async (res) => {
-      console.log("res>>>>>>>>",res)
+      await TagsModel.find({ "type": "question", "name": tag.toUpperCase() }).then(async (res) => {
+        console.log("res>>>>>>>>", res)
 
         await res.map((tag) => {
           tags.push(tag.question_id)
         })
       })
-      console.log("tags>>>>>>>>",tags)
+      console.log("tags>>>>>>>>", tags)
 
       if (tags.length > 0) {
         query = [{ $match: { _id: { $in: tags } } }]
       }
-      console.log("tag query>>>>>>>>>>>>",query)
-      console.log("tags>>>>>>>>>>>>",tags)
+      console.log("tag query>>>>>>>>>>>>", query)
+      console.log("tags>>>>>>>>>>>>", tags)
 
     } else {
 

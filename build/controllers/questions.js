@@ -132,6 +132,29 @@ exports.QuestionsController.get('/get/:id', async (request, response, next) => {
         next(error);
     }
 });
+exports.QuestionsController.get("/", async (request, response, next) => {
+    try {
+        await models_1.QuestionModel.find().then((val) => {
+            if (val) {
+                response.status(200).send({
+                    status: "SUCCESS",
+                    msg: "Question details successfully",
+                    payload: val,
+                });
+            }
+            else {
+                response.status(404).send({
+                    status: "ERROR",
+                    msg: "Oops! Question not found.",
+                    payload: [],
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.QuestionsController.put('/', async (request, response, next) => {
     try {
         const { limit = 3, page = 1, level, search, tag } = request.body;
