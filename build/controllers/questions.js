@@ -171,6 +171,12 @@ exports.QuestionsController.put('/', async (request, response, next) => {
             .limit(limit * 1)
             .then((val) => {
             if (val) {
+                val.map((i, res) => {
+                    return {
+                        "index": i + 1,
+                        ...res
+                    };
+                });
                 response.status(200).send({
                     "status": "SUCCESS",
                     "msg": "Question details successfully",
