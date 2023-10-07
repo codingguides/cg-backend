@@ -79,7 +79,7 @@ exports.TopicController.put('/update/:id', async (request, response, next) => {
             if (result) {
                 response.status(200).send({
                     "status": "SUCCESS",
-                    "msg": result.nModified == 1 ? "Topic Succefully Updated" : "Something Wrong Please Try Again"
+                    "msg": "Topic Succefully Updated"
                 });
             }
             else {
