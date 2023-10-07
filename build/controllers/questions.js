@@ -18,7 +18,7 @@ exports.QuestionsController.post('/add', (0, express_validator_1.check)('questio
             if (data.length > 0) {
                 response.status(200).send({
                     "success": false,
-                    "message": "Question already exists."
+                    "msg": "Question already exists."
                 });
             }
             else {
@@ -124,6 +124,29 @@ exports.QuestionsController.get('/get/:id', async (request, response, next) => {
                 response.status(404).send({
                     "status": "ERROR",
                     "msg": "Oops! question not found."
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.QuestionsController.get("/", async (request, response, next) => {
+    try {
+        await models_1.QuestionModel.find().then((val) => {
+            if (val) {
+                response.status(200).send({
+                    status: "SUCCESS",
+                    msg: "Question details successfully",
+                    payload: val,
+                });
+            }
+            else {
+                response.status(404).send({
+                    status: "ERROR",
+                    msg: "Oops! Question not found.",
+                    payload: [],
                 });
             }
         });
