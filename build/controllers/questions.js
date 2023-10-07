@@ -18,7 +18,7 @@ exports.QuestionsController.post('/add', (0, express_validator_1.check)('questio
             if (data.length > 0) {
                 response.status(200).send({
                     "success": false,
-                    "message": "Question already exists."
+                    "msg": "Question already exists."
                 });
             }
             else {

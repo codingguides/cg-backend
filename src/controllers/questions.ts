@@ -27,7 +27,7 @@ QuestionsController.post('/add',
         if (data.length > 0) {
           response.status(200).send({
             "success": false,
-            "message": "Question already exists."
+            "msg": "Question already exists."
           });
         } else {
 
