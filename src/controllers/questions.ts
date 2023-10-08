@@ -229,15 +229,17 @@ QuestionsController.put('/', async (request: Request, response: Response, next: 
       .limit(limit * 1)
       .then((val) => {
         if (val) {
-          val.map((i:number,res:any)=>{
-          return {
-            "index": i+1,
-            ...res
-          }})
+          let newArray = [];
+          val.map((res:any,i:number)=>{
+            newArray.push({
+              "index": i+1,
+              ...res
+            })
+          })
           response.status(200).send({
             "status": "SUCCESS",
             "msg": "Question details successfully",
-            "payload": val,
+            "payload": newArray,
             "totalPages": Math.ceil(count / limit),
             "currentPage": page
           });
