@@ -34,14 +34,14 @@ TopicController.post('/add',
         } else {
 
           let topicData = {}
-          if(body.parent_id == 0){
+          if (body.parent_id == 0) {
             topicData = {
               name: body.name,
               description: body.description,
               slug: body.slug,
               user_id: ObjectId(body.user_id)
             }
-          }else{
+          } else {
             topicData = {
               name: body.name,
               description: body.description,
@@ -76,7 +76,7 @@ TopicController.post('/add',
 
       next(error)
     }
-});
+  });
 
 TopicController.put('/update/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -95,7 +95,7 @@ TopicController.put('/update/:id', async (request: Request, response: Response, 
         if (result) {
           response.status(200).send({
             "status": "SUCCESS",
-            "msg": result.nModified == 1 ? "Topic Succefully Updated" : "Something Wrong Please Try Again"
+            "msg": "Topic Succefully Updated"
           });
         } else {
           response.status(404).send({
@@ -158,20 +158,20 @@ TopicController.get('/get/:id', async (request: Request, response: Response, nex
         }
       }
     ])
-    .then((val) => {
-      if (val) {
-        response.status(200).send({
-          "status": "SUCCESS",
-          "msg": "Topics details successfully",
-          "payload": val
-        });
-      } else {
-        response.status(404).send({
-          "status": "ERROR",
-          "msg": "Oops! topic not found."
-        });
-      }
-    })
+      .then((val) => {
+        if (val) {
+          response.status(200).send({
+            "status": "SUCCESS",
+            "msg": "Topics details successfully",
+            "payload": val
+          });
+        } else {
+          response.status(404).send({
+            "status": "ERROR",
+            "msg": "Oops! topic not found."
+          });
+        }
+      })
 
   } catch (error) {
     next(error)
@@ -183,21 +183,21 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
 
     const { limit = 2, page = 1, type, search } = request.body;
     const count = await TopicModel.count();
-  
+
 
     let tags = [];
     let query = []
-    if(type === "Tag"){
+    if (type === "Tag") {
       console.log("under if")
-      await TagsModel.find({"type": "topic","name": search.toUpperCase()},{"topic_id":1,"_id":0}).then(async (res)=>{
-        await res.map((tag)=>{
+      await TagsModel.find({ "type": "topic", "name": search.toUpperCase() }, { "topic_id": 1, "_id": 0 }).then(async (res) => {
+        await res.map((tag) => {
           tags.push(tag.topic_id)
         })
       })
-      if(tags.length > 0){
-        console.log("tags>>>>>>>>>>",tags)
+      if (tags.length > 0) {
+        console.log("tags>>>>>>>>>>", tags)
         query = [
-          { $match:{ _id : { $in: tags } }} ,
+          { $match: { _id: { $in: tags } } },
           {
             $lookup: {
               from: "topics",
@@ -215,19 +215,19 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
             }
           }
         ]
-      }else{
-       console.log("else tags")
-       throw response.status(200).send({
-        "status": "ERROR",
-        "msg": "Oops! topic not found.",
-        "payload": []
-      });
-       
+      } else {
+        console.log("else tags")
+        throw response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! topic not found.",
+          "payload": []
+        });
+
       }
-      console.log("tags>>>>>",tags)
-    }else if(type === "Topic"){
+      console.log("tags>>>>>", tags)
+    } else if (type === "Topic") {
       query = [
-        { $match:{ name : {'$regex' : search, '$options' : 'i'} }},
+        { $match: { name: { '$regex': search, '$options': 'i' } } },
         {
           $lookup: {
             from: "topics",
@@ -245,9 +245,9 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
           }
         }
       ]
-    }else if(type === "Slug"){
+    } else if (type === "Slug") {
       query = [
-        { $match:{ slug : {'$regex' : search, '$options' : 'i'} }},
+        { $match: { slug: { '$regex': search, '$options': 'i' } } },
         {
           $lookup: {
             from: "topics",
@@ -265,7 +265,7 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
           }
         }
       ]
-    }else {
+    } else {
       query = [
         {
           $lookup: {
@@ -286,12 +286,12 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
       ]
     }
 
-    console.log("query>>>>>>>>",query)
+    console.log("query>>>>>>>>", query)
 
     await TopicModel.aggregate(query)
-    .skip((page - 1) * limit)
-    .limit(limit * 1)
-    .then((val) => {
+      .skip((page - 1) * limit)
+      .limit(limit * 1)
+      .then((val) => {
         if (val) {
           response.status(200).send({
             "status": "SUCCESS",
