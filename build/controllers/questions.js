@@ -201,7 +201,6 @@ exports.QuestionsController.put('/', async (request, response, next) => {
                         ...res
                     });
                 });
-                console.log("val>>>>>>>>>>>", val);
                 response.status(200).send({
                     "status": "SUCCESS",
                     "msg": "Question details successfully",

@@ -7,7 +7,7 @@ import { QuestionsController } from "./questions";
 import { RelationController } from "./relation";
 import { BlogController } from "./blog";
 
-import { FrontendTopicController } from "./forntend/topic";
+import { FrontendController } from "./forntend/page";
 
 
 export const RootController = Router()
@@ -19,4 +19,4 @@ RootController.use("/questions", Authguard,  QuestionsController);
 RootController.use("/relation", Authguard,  RelationController);
 RootController.use("/blog", Authguard,  BlogController);
 
-RootController.use("/page", FrontendTopicController);
+RootController.use("/page", FrontendController);
