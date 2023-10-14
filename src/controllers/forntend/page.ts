@@ -30,7 +30,7 @@ FrontendController.get('/get-menu', async (request: Request, response: Response,
   }
 });
 
-FrontendController.get('/get-side-menu', async (request: Request, response: Response, next: NextFunction) => {
+FrontendController.get('/get-side-menu-test', async (request: Request, response: Response, next: NextFunction) => {
   try {
 
     await TopicModel.find().then(async(val) => {
@@ -85,7 +85,7 @@ FrontendController.get('/get-side-menu', async (request: Request, response: Resp
   }
 });
 
-FrontendController.get('/get-side-menu-test', async (request: Request, response: Response, next: NextFunction) => {
+FrontendController.get('/get-side-menu', async (request: Request, response: Response, next: NextFunction) => {
   try {
 
     
@@ -115,99 +115,6 @@ FrontendController.get('/get-side-menu-test', async (request: Request, response:
       return tree;
     }
     
-
-    // let categories = [
-    //   {
-    //     showNav: true,
-    //     _id: '650fd9f6abd17375cc8b5eab',
-    //     name: 'JavaScript',
-    //     description: '<p>This is JavaScript.</p>\n',
-    //     slug: 'javascript',
-    //     user_id: '64bced80877787126c3c2b9e'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '650fdedbabd17375cc8b5ecf',
-    //     name: 'Quiz for Beginners',
-    //     description: '<p>You can test your JavaScript skills with &#39;Codingguides&#39; Quiz. The Quiz contains 15 questions each&nbsp;and has no time limit.</p>\n',
-    //     slug: 'quiz-for-beginners',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '650fd9f6abd17375cc8b5eab'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '650fdfbbabd17375cc8b5ef3',
-    //     name: 'JS Beginners Quiz 1',
-    //     description: '<p>The Quiz contains 15 questions and there has no time limit.&nbsp;You can&#39;t exit from the Quiz once Started.</p>\n',      
-    //     slug: 'js-beginners-quiz-1',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '650fdedbabd17375cc8b5ecf'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '650fdff9abd17375cc8b5f1a',
-    //     name: 'JS Beginners Quiz 2',
-    //     description: '<p>The Quiz contains 15 questions and there has no time limit.&nbsp;You can&#39;t exit from the Quiz once Started.</p>\n',      
-    //     slug: 'js-beginners-quiz-2',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '650fdedbabd17375cc8b5ecf'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '65225e6fe1ab957e28c8e080',
-    //     name: 'Quiz for Intermediate',
-    //     description: '<p>You can test your JavaScript skills with &#39;Codingguides&#39; Quiz. The Quiz contains 15 questions each and has&nbsp;a time limit.</p>\n',
-    //     slug: 'quiz-for-intermediate',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '650fd9f6abd17375cc8b5eab'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '6522b557e1ab957e28c8e18d',
-    //     name: 'Quiz for Advanced',
-    //     description: '<p>You can test your JavaScript skills with &#39;Codingguides&#39; Quiz. The Quiz contains 15 questions each and has&nbsp;a time limit.</p>\n',
-    //     slug: 'quiz-for-advanced',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '650fd9f6abd17375cc8b5eab'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '6522b71de1ab957e28c8e1d1',
-    //     name: 'JS Intermediate Quiz 1',
-    //     description: '<p>The Quiz contains 15 questions and there has a time limit.&nbsp;You can&#39;t exit from the Quiz once Started.</p>\n',       
-    //     slug: 'js-intermediate-quiz-1',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '65225e6fe1ab957e28c8e080'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '6522b772e1ab957e28c8e1ed',
-    //     name: 'JS Intermediate Quiz 2',
-    //     description: '<p>The Quiz contains 15 questions and there has a time limit.&nbsp;You can&#39;t exit from the Quiz once Started.</p>\n',       
-    //     slug: 'js-intermediate-quiz-2',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '65225e6fe1ab957e28c8e080'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '6522b80de1ab957e28c8e20d',
-    //     name: 'JS Advanced Quiz 1',
-    //     description: '<p>The Quiz contains 15 questions and there has a time limit.&nbsp;You can&#39;t exit from the Quiz once Started.</p>\n',       
-    //     slug: 'js-advanced-quiz-1',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '6522b557e1ab957e28c8e18d'
-    //   },
-    //   {
-    //     showNav: false,
-    //     _id: '6522b88fe1ab957e28c8e22f',
-    //     name: 'JS Advanced Quiz 2',
-    //     description: '<p>The Quiz contains 15 questions and there has a time limit.&nbsp;You can&#39;t exit from the Quiz once Started.</p>\n',       
-    //     slug: 'js-advanced-quiz-2',
-    //     user_id: '64bced80877787126c3c2b9e',
-    //     parent_id: '6522b557e1ab957e28c8e18d'
-    //   }
-    // ]
-
     let cateList = [
       {
         _id: '650fd9f6abd17375cc8b5eab',
