@@ -17,7 +17,7 @@ FrontendController.get('/get-menu', async (request: Request, response: Response,
           "payload": val
         });
       } else {
-        response.status(404).send({
+        response.status(200).send({
           "status": "ERROR",
           "msg": "Oops! topic not found."
         });
@@ -124,7 +124,7 @@ FrontendController.get('/get-quiz-list/:slug', async (request: Request, response
           } else {
             console.log("sub else")
 
-            response.status(404).send({
+            response.status(200).send({
               "status": "ERROR",
               "msg": "Oops! sub topic not found."
             });
@@ -133,7 +133,7 @@ FrontendController.get('/get-quiz-list/:slug', async (request: Request, response
       } else {
         console.log("else")
 
-        response.status(404).send({
+        response.status(200).send({
           "status": "ERROR",
           "msg": "Oops! slug not found."
         });
@@ -165,23 +165,23 @@ FrontendController.get('/quiz/:slug', async (request: Request, response: Respons
                   "payload": questions
                 });
               } else {
-                response.status(404).send({
+                response.status(200).send({
                   "status": "ERROR",
                   "msg": "Oops! questions not found."
                 });
               }
             })
           } else {
-            response.status(404).send({
+            response.status(200).send({
               "status": "ERROR",
               "msg": "Oops! relation not found."
             });
           }
         })
       } else {
-        response.status(404).send({
+        response.status(200).send({
           "status": "ERROR",
-          "msg": "Oops! topic not found."
+          "msg": "Oops! relation not found."
         });
       }
     })
