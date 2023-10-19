@@ -7,6 +7,9 @@ import { QuestionsController } from "./questions";
 import { RelationController } from "./relation";
 import { BlogController } from "./blog";
 
+import { QuizAnalyticsController } from "./quizAnalytics";
+
+
 import { FrontendController } from "./forntend/page";
 
 
@@ -18,5 +21,7 @@ RootController.use("/tags", Authguard,  TagsController);
 RootController.use("/questions", Authguard,  QuestionsController);
 RootController.use("/relation", Authguard,  RelationController);
 RootController.use("/blog", Authguard,  BlogController);
+
+RootController.use("/quiz-analytics", Authguard,  QuizAnalyticsController);
 
 RootController.use("/page", FrontendController);

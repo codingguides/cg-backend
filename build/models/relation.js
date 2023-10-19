@@ -14,7 +14,11 @@ const relationSchema = new mongoose_1.Schema({
     blog_id: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Blogs'
-    }
+    },
+    type: {
+        type: String,
+        enum: ["blog", "topic"],
+    },
 }, { timestamps: true });
 exports.RelationModel = (0, mongoose_1.model)("relation", relationSchema);
 //# sourceMappingURL=relation.js.map

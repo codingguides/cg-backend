@@ -11,7 +11,11 @@ const relationSchema = new Schema({
     blog_id: {
         type: Schema.Types.ObjectId,
         ref: 'Blogs'
-    }
+    },
+    type:{
+        type:String,
+        enum: ["blog", "topic"],
+    },
 }, { timestamps: true });
 
 export const RelationModel = model("relation", relationSchema);

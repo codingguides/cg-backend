@@ -5,7 +5,10 @@ const express_1 = require("express");
 const models_1 = require("../models");
 const express_validator_1 = require("express-validator");
 exports.RelationController = (0, express_1.Router)();
-exports.RelationController.post('/add', (0, express_validator_1.check)('topic_id').not().isEmpty().withMessage('Topic id is required'), (0, express_validator_1.check)('question_id').not().isEmpty().withMessage('Question id is required'), async (request, response, next) => {
+exports.RelationController.post('/add', 
+// check('topic_id').not().isEmpty().withMessage('Topic id is required'),
+// check('question_id').not().isEmpty().withMessage('Question id is required'),
+async (request, response, next) => {
     try {
         var ObjectId = require('mongodb').ObjectId;
         const errors = (0, express_validator_1.validationResult)(request);
@@ -21,14 +24,16 @@ exports.RelationController.post('/add', (0, express_validator_1.check)('topic_id
                 query = { "question_id": body.question_id, "topic_id": body.topic_id };
                 qbody = {
                     topic_id: body.topic_id,
-                    question_id: body.question_id
+                    question_id: body.question_id,
+                    type: "topic"
                 };
             }
             else {
                 query = { "question_id": body.question_id, "blog_id": body.blog_id };
                 qbody = {
                     blog_id: body.blog_id,
-                    question_id: body.question_id
+                    question_id: body.question_id,
+                    type: "blog"
                 };
             }
             const data = await models_1.RelationModel.find(query);
@@ -133,6 +138,51 @@ exports.RelationController.get('/get/:topic_id', async (request, response, next)
         next(error);
     }
 });
+exports.RelationController.get('/blog/:blog_id', async (request, response, next) => {
+    try {
+        const { blog_id } = request.params;
+        var ObjectId = require('mongodb').ObjectId;
+        await models_1.RelationModel.aggregate([
+            {
+                $match: { blog_id: ObjectId(blog_id) }
+            },
+            {
+                $lookup: {
+                    from: "blog",
+                    localField: "blog_id",
+                    foreignField: "_id",
+                    as: "blog"
+                }
+            },
+            {
+                $lookup: {
+                    from: "questions",
+                    localField: "question_id",
+                    foreignField: "_id",
+                    as: "questions"
+                }
+            }
+        ])
+            .then((values) => {
+            if (values) {
+                response.status(200).send({
+                    "status": "SUCCESS",
+                    "msg": "Relation details successfully",
+                    "payload": values
+                });
+            }
+            else {
+                response.status(404).send({
+                    "status": "ERROR",
+                    "msg": "Oops! relation not found."
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.RelationController.get('/get/:type/:id', async (request, response, next) => {
     try {
         const { id, type } = request.params;
@@ -141,7 +191,7 @@ exports.RelationController.get('/get/:type/:id', async (request, response, next)
         if (type == 'topic') {
             query = [
                 {
-                    $match: { topic_id: ObjectId(id) }
+                    $match: { topic_id: ObjectId(id), type: "topic" }
                 },
                 {
                     $lookup: {
@@ -161,10 +211,10 @@ exports.RelationController.get('/get/:type/:id', async (request, response, next)
                 }
             ];
         }
-        else if (type == 'question') {
+        else if (type == 'blog') {
             query = [
                 {
-                    $match: { question_id: ObjectId(id) }
+                    $match: { question_id: ObjectId(id), type: "blog" }
                 },
                 {
                     $lookup: {

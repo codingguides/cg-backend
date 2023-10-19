@@ -5,8 +5,8 @@ import {check, body, validationResult } from 'express-validator';
 export const RelationController = Router();
 
 RelationController.post('/add', 
-  check('topic_id').not().isEmpty().withMessage('Topic id is required'),
-  check('question_id').not().isEmpty().withMessage('Question id is required'),
+  // check('topic_id').not().isEmpty().withMessage('Topic id is required'),
+  // check('question_id').not().isEmpty().withMessage('Question id is required'),
   async (request: Request, response: Response, next: NextFunction) => {
   try {
     var ObjectId = require('mongodb').ObjectId;
@@ -23,13 +23,15 @@ RelationController.post('/add',
         query = { "question_id": body.question_id, "topic_id": body.topic_id };
         qbody = {
           topic_id: body.topic_id,
-          question_id: body.question_id
+          question_id: body.question_id,
+          type: "topic"
         };
       }else{
         query = { "question_id": body.question_id, "blog_id": body.blog_id };
         qbody = {
           blog_id: body.blog_id,
-          question_id: body.question_id
+          question_id: body.question_id,
+          type: "blog"
         };
       }
 
@@ -141,6 +143,52 @@ RelationController.get('/get/:topic_id', async (request: Request, response: Resp
   }
 });
 
+RelationController.get('/blog/:blog_id', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { blog_id } = request.params;
+    var ObjectId = require('mongodb').ObjectId;
+
+    await RelationModel.aggregate([
+      {
+        $match: { blog_id: ObjectId(blog_id) }
+      },
+      {
+        $lookup: {
+          from: "blog",
+          localField: "blog_id",
+          foreignField: "_id",
+          as: "blog"
+        }
+      },
+      {
+        $lookup: {
+          from: "questions",
+          localField: "question_id",
+          foreignField: "_id",
+          as: "questions"
+        }
+      }
+    ])
+    .then((values) => {
+      if (values) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Relation details successfully",
+          "payload": values
+        });
+      } else {
+        response.status(404).send({
+          "status": "ERROR",
+          "msg": "Oops! relation not found."
+        });
+      }
+    })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
 RelationController.get('/get/:type/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id, type } = request.params;
@@ -150,7 +198,7 @@ RelationController.get('/get/:type/:id', async (request: Request, response: Resp
     if(type == 'topic'){
       query = [
         {
-          $match: { topic_id: ObjectId(id) }
+          $match: { topic_id: ObjectId(id), type: "topic" }
         },
         {
           $lookup: {
@@ -169,10 +217,10 @@ RelationController.get('/get/:type/:id', async (request: Request, response: Resp
           }
         }
       ]
-    }else if(type == 'question'){
+    }else if(type == 'blog'){
       query = [
         {
-          $match: { question_id: ObjectId(id) }
+          $match: { question_id: ObjectId(id), type: "blog" }
         },
         {
           $lookup: {
