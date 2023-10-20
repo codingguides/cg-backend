@@ -24,7 +24,7 @@ export const UserController = Router();
 UserController.post(
   '/signup',
   body('email', "Invalid Email!").isEmail(),
-  body('password', "Password must be at least 5 characters long.").isLength({ min: 5 }),
+  body('password', "Password must be at least 5 characters long!").isLength({ min: 5 }),
 
   async (request: Request, response: Response, next: NextFunction) => {
 
@@ -310,7 +310,7 @@ UserController.put('/reset-password/:id', async (request: Request, response: Res
 UserController.post(
   '/login',
   body('email', "Invalid Email!").isEmail(),
-  body('password', "Password must be at least 5 characters long.").isLength({ min: 5 }),
+  body('password', "Password must be at least 5 characters long!").isLength({ min: 5 }),
   async (request: Request, response: Response, next: NextFunction) => {
 
     const errors = validationResult(request);

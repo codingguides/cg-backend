@@ -21,7 +21,7 @@ exports.UserController = (0, express_1.Router)();
 ** API NAME: User signup
 ** Methode: POST
 */
-exports.UserController.post('/signup', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 5 characters long.").isLength({ min: 5 }), async (request, response, next) => {
+exports.UserController.post('/signup', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 5 characters long!").isLength({ min: 5 }), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
         // return response.status(400).json({ errors: errors.array() });
@@ -286,7 +286,7 @@ exports.UserController.put('/reset-password/:id', async (request, response, next
 ** API NAME: User login
 ** Methode: POST
 */
-exports.UserController.post('/login', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 5 characters long.").isLength({ min: 5 }), async (request, response, next) => {
+exports.UserController.post('/login', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 5 characters long!").isLength({ min: 5 }), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
         // return response.status(400).json({ errors: errors.array() });
