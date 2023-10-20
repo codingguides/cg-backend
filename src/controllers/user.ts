@@ -10,7 +10,7 @@ let key = "KSpYChPbbKRrEIOj685rmY5d7eICGS5t";
 let tokenType = "Bearer";
 // let xlsxj = require("xlsx-to-json");
 
-import {check, body, validationResult } from 'express-validator';
+import { check, body, validationResult } from 'express-validator';
 
 
 export const UserController = Router();
@@ -22,12 +22,12 @@ export const UserController = Router();
 */
 
 UserController.post(
-  '/signup', 
+  '/signup',
   body('email').isEmail(),
   body('password').isLength({ min: 5 }),
 
   async (request: Request, response: Response, next: NextFunction) => {
-  
+
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
       return response.status(400).json({ errors: errors.array() });
@@ -45,8 +45,13 @@ UserController.post(
 
         if (data.length > 0) {
           response.status(200).send({
-            "success": false,
-            "message": "An Account already exists with this email or phone number."
+            result: 'error',
+            "errors": [
+              {
+                "success": false,
+                "message": "An Account already exists with this email or phone number."
+              }
+            ]
           });
         } else {
 
@@ -75,7 +80,7 @@ UserController.post(
       }
     }
 
-});
+  });
 
 /*
 ** API NAME: User forgot password by id
@@ -300,13 +305,16 @@ UserController.put('/reset-password/:id', async (request: Request, response: Res
 
 UserController.post(
   '/login',
-  body('email').isEmail(),
+  body('email', "Invalid Email!").isEmail(),
   body('password').isLength({ min: 5 }),
   async (request: Request, response: Response, next: NextFunction) => {
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
+      // return response.status(400).json({ errors: errors.array() });
+      return response.status(200).send({
+        "errors": errors.array()
+      });
     } else {
       try {
         const { body } = request;
@@ -316,7 +324,7 @@ UserController.post(
           bcrypt.compare(body.password, data['password'], function (err, result) {
             // if (err) throw err;
             if (result) {
-            console.log("if bcrypt")
+              console.log("if bcrypt")
 
               const payload = {
                 id: data._id,
@@ -363,6 +371,6 @@ UserController.post(
         next(error)
       }
     }
-});
+  });
 
 

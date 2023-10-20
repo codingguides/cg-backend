@@ -39,8 +39,13 @@ exports.UserController.post('/signup', (0, express_validator_1.body)('email').is
             });
             if (data.length > 0) {
                 response.status(200).send({
-                    "success": false,
-                    "message": "An Account already exists with this email or phone number."
+                    result: 'error',
+                    "errors": [
+                        {
+                            "success": false,
+                            "message": "An Account already exists with this email or phone number."
+                        }
+                    ]
                 });
             }
             else {
@@ -277,10 +282,13 @@ exports.UserController.put('/reset-password/:id', async (request, response, next
 ** API NAME: User login
 ** Methode: POST
 */
-exports.UserController.post('/login', (0, express_validator_1.body)('email').isEmail(), (0, express_validator_1.body)('password').isLength({ min: 5 }), async (request, response, next) => {
+exports.UserController.post('/login', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password').isLength({ min: 5 }), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
-        return response.status(400).json({ errors: errors.array() });
+        // return response.status(400).json({ errors: errors.array() });
+        return response.status(200).send({
+            "errors": errors.array()
+        });
     }
     else {
         try {
