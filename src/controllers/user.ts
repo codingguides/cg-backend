@@ -23,14 +23,18 @@ export const UserController = Router();
 
 UserController.post(
   '/signup',
-  body('email').isEmail(),
-  body('password').isLength({ min: 5 }),
+  body('email', "Invalid Email!").isEmail(),
+  body('password', "Password must be at least 5 characters long.").isLength({ min: 5 }),
 
   async (request: Request, response: Response, next: NextFunction) => {
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      return response.status(400).json({ errors: errors.array() });
+      // return response.status(400).json({ errors: errors.array() });
+      return response.status(200).send({
+        result: 'error',
+        "errors": errors.array()
+      });
     } else {
       try {
         const { body } = request;
@@ -49,7 +53,7 @@ UserController.post(
             "errors": [
               {
                 "success": false,
-                "message": "An Account already exists with this email or phone number."
+                "msg": "An Account already exists with this email or phone number."
               }
             ]
           });
@@ -306,7 +310,7 @@ UserController.put('/reset-password/:id', async (request: Request, response: Res
 UserController.post(
   '/login',
   body('email', "Invalid Email!").isEmail(),
-  body('password').isLength({ min: 5 }),
+  body('password', "Password must be at least 5 characters long.").isLength({ min: 5 }),
   async (request: Request, response: Response, next: NextFunction) => {
 
     const errors = validationResult(request);
