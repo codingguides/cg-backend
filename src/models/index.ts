@@ -7,3 +7,4 @@ export * from "./topice";
 export * from "./relation";
 export * from "./blog";
 export * from "./quizAnalytics";
+export * from "./newsletter";

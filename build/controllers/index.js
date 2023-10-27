@@ -9,6 +9,7 @@ const tag_1 = require("./tag");
 const questions_1 = require("./questions");
 const relation_1 = require("./relation");
 const blog_1 = require("./blog");
+const newsletter_1 = require("./newsletter");
 const quizAnalytics_1 = require("./quizAnalytics");
 const page_1 = require("./forntend/page");
 exports.RootController = (0, express_1.Router)();
@@ -19,6 +20,7 @@ exports.RootController.use("/tags", guards_1.Authguard, tag_1.TagsController);
 exports.RootController.use("/questions", guards_1.Authguard, questions_1.QuestionsController);
 exports.RootController.use("/relation", guards_1.Authguard, relation_1.RelationController);
 exports.RootController.use("/blog", guards_1.Authguard, blog_1.BlogController);
+exports.RootController.use("/newsletter", guards_1.Authguard, newsletter_1.NewsletterController);
 exports.RootController.use("/quiz-analytics", guards_1.Authguard, quizAnalytics_1.QuizAnalyticsController);
 exports.RootController.use("/page", page_1.FrontendController);
 //# sourceMappingURL=index.js.map
