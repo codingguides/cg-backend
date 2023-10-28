@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { QuestionModel, RelationModel, NewsletterModel, TopicModel } from "../../models";
+import { QuestionModel, RelationModel, NewsletterModel, TopicModel, BlogModel } from "../../models";
 import { body, validationResult } from "express-validator";
 import { isEmpty } from "lodash";
 
@@ -242,4 +242,53 @@ FrontendController.post('/newsletter', body('email', "Invalid Email!").isEmail()
         next(error)
       }
     }
+});
+
+FrontendController.get('/blog', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+
+    await BlogModel.find().limit(10).then((val) => {
+      if (val) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Blog details successfully",
+          "payload": val
+        });
+      } else {
+        response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! blog not found."
+        });
+      }
+
+    })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
+FrontendController.get('/blog/:slug', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { slug } = request.params;
+
+    await BlogModel.find({ "slug": slug }).then((val) => {
+      if (val) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Blog details successfully",
+          "payload": val
+        });
+      } else {
+        response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! blog not found."
+        });
+      }
+
+    })
+
+  } catch (error) {
+    next(error)
+  }
 });
