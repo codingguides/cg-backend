@@ -23,4 +23,5 @@ __exportStar(require("./topice"), exports);
 __exportStar(require("./relation"), exports);
 __exportStar(require("./blog"), exports);
 __exportStar(require("./quizAnalytics"), exports);
+__exportStar(require("./newsletter"), exports);
 //# sourceMappingURL=index.js.map

@@ -6,7 +6,7 @@ import { TagsController } from "./tag";
 import { QuestionsController } from "./questions";
 import { RelationController } from "./relation";
 import { BlogController } from "./blog";
-
+import { NewsletterController } from "./newsletter";
 import { QuizAnalyticsController } from "./quizAnalytics";
 
 
@@ -21,6 +21,7 @@ RootController.use("/tags", Authguard,  TagsController);
 RootController.use("/questions", Authguard,  QuestionsController);
 RootController.use("/relation", Authguard,  RelationController);
 RootController.use("/blog", Authguard,  BlogController);
+RootController.use("/newsletter", Authguard,  NewsletterController);
 
 RootController.use("/quiz-analytics", Authguard,  QuizAnalyticsController);
 

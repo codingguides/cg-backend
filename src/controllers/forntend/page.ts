@@ -1,10 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { QuestionModel, RelationModel, TagsModel, TopicModel } from "../../models";
+import { QuestionModel, RelationModel, NewsletterModel, TopicModel, BlogModel } from "../../models";
+import { body, validationResult } from "express-validator";
+import { isEmpty } from "lodash";
 
 export const FrontendController = Router();
-
-console.log("<=========================topic -===============>");
-
 
 FrontendController.get('/get-menu', async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -184,6 +183,109 @@ FrontendController.get('/quiz/:slug', async (request: Request, response: Respons
           "msg": "Oops! relation not found."
         });
       }
+    })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
+FrontendController.post('/newsletter', body('email', "Invalid Email!").isEmail(),
+  async (request: Request, response: Response, next: NextFunction) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+      return response.status(200).send({
+        result: 'error',
+        "errors": errors.array()
+      });
+    } else {
+      try {
+        const { body } = request;
+        await NewsletterModel.syncIndexes();
+        const data = await NewsletterModel.find({
+          $or: [
+            { "email": body.email }
+          ]
+        });
+
+        if (data.length > 0) {
+          response.status(200).send({
+            result: 'error',
+            "errors": [
+              {
+                "success": false,
+                "msg": "This email already exists in our system."
+              }
+            ]
+          });
+        } else {
+          let userData = new NewsletterModel({
+            email: body.email
+          });
+          userData.save(
+            function (err, data) {
+              if (data) {
+                response.status(200).send({
+                  result: 'success',
+                  "success": [
+                    {
+                      "success": true,
+                      "msg": "We will get back to you soon."
+                    }
+                  ]
+                });
+              } else if (err) throw err;
+            }
+          );
+        }
+      } catch (error) {
+        next(error)
+      }
+    }
+});
+
+FrontendController.get('/blog', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+
+    await BlogModel.find().limit(10).then((val) => {
+      if (val) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Blog details successfully",
+          "payload": val
+        });
+      } else {
+        response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! blog not found."
+        });
+      }
+
+    })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
+FrontendController.get('/blog/:slug', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { slug } = request.params;
+
+    await BlogModel.find({ "slug": slug }).then((val) => {
+      if (val) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Blog details successfully",
+          "payload": val
+        });
+      } else {
+        response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! blog not found."
+        });
+      }
+
     })
 
   } catch (error) {
