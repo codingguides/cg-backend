@@ -5,7 +5,7 @@ const express_1 = require("express");
 const models_1 = require("../models");
 const express_validator_1 = require("express-validator");
 exports.QuestionsController = (0, express_1.Router)();
-exports.QuestionsController.post('/add', (0, express_validator_1.check)('question').not().isEmpty().withMessage('Question is required'), (0, express_validator_1.check)('options').not().isEmpty().withMessage('options is required'), (0, express_validator_1.check)('rightoption').not().isEmpty().withMessage('rightoption is required'), (0, express_validator_1.check)('level').not().isEmpty().withMessage('level is required'), (0, express_validator_1.check)('questiontype').not().isEmpty().withMessage('questiontype is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), async (request, response, next) => {
+exports.QuestionsController.post('/add', (0, express_validator_1.check)('question').not().isEmpty().withMessage('Question is required'), (0, express_validator_1.check)('options').not().isEmpty().withMessage('options is required'), (0, express_validator_1.check)('rightoption').not().isEmpty().withMessage('rightoption is required'), (0, express_validator_1.check)('level').not().isEmpty().withMessage('level is required'), (0, express_validator_1.check)('questiontype').not().isEmpty().withMessage('questiontype is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), (0, express_validator_1.check)('rightAnswerDescription').not().isEmpty().withMessage('rightAnswerDescription is required'), async (request, response, next) => {
     try {
         const errors = (0, express_validator_1.validationResult)(request);
         if (!errors.isEmpty()) {
@@ -29,7 +29,8 @@ exports.QuestionsController.post('/add', (0, express_validator_1.check)('questio
                     point: body.point,
                     level: body.level,
                     questiontype: body.questiontype,
-                    user_id: body.user_id
+                    user_id: body.user_id,
+                    rightAnswerDescription: body.rightAnswerDescription,
                 });
                 QuestionData.save(function (err, data) {
                     if (data) {

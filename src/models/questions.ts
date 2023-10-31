@@ -19,9 +19,12 @@ const QuestionSchema = new Schema({
         enum: ["fillintheblanks", "checkbox", "radiobutton", "text"],
     },
     user_id: {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'Users'
-    }
+    },
+    rightAnswerDescription: {
+        type: String,
+    },
 
 }, { timestamps: true });
 

@@ -13,6 +13,7 @@ QuestionsController.post('/add',
   check('level').not().isEmpty().withMessage('level is required'),
   check('questiontype').not().isEmpty().withMessage('questiontype is required'),
   check('user_id').not().isEmpty().withMessage('user_id is required'),
+  check('rightAnswerDescription').not().isEmpty().withMessage('rightAnswerDescription is required'),
   async (request: Request, response: Response, next: NextFunction) => {
     try {
 
@@ -38,7 +39,8 @@ QuestionsController.post('/add',
             point: body.point,
             level: body.level,
             questiontype: body.questiontype,
-            user_id: body.user_id
+            user_id: body.user_id,
+            rightAnswerDescription: body.rightAnswerDescription,
           });
           QuestionData.save(
             function (err, data) {
@@ -230,9 +232,9 @@ QuestionsController.put('/', async (request: Request, response: Response, next: 
       .then((val) => {
         if (val) {
           let newArray = [];
-          val.map((res:any,i:number)=>{
+          val.map((res: any, i: number) => {
             newArray.push({
-              "index": i+1,
+              "index": i + 1,
               ...res
             })
           })
