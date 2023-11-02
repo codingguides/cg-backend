@@ -20,7 +20,7 @@ async (request, response, next) => {
             let query = {};
             let qbody = {};
             await models_1.RelationModel.syncIndexes();
-            if (body.topic_id) {
+            if (body.question_id) {
                 query = { "question_id": body.question_id, "topic_id": body.topic_id };
                 qbody = {
                     topic_id: body.topic_id,
@@ -29,10 +29,10 @@ async (request, response, next) => {
                 };
             }
             else {
-                query = { "question_id": body.question_id, "blog_id": body.blog_id };
+                query = { "topic_id": body.topic_id, "blog_id": body.blog_id };
                 qbody = {
+                    topic_id: body.topic_id,
                     blog_id: body.blog_id,
-                    question_id: body.question_id,
                     type: "blog"
                 };
             }
@@ -188,6 +188,7 @@ exports.RelationController.get('/get/:type/:id', async (request, response, next)
         const { id, type } = request.params;
         let query = [];
         var ObjectId = require('mongodb').ObjectId;
+        console.log(id, ">>>>>>>>>>", type);
         if (type == 'topic') {
             query = [
                 {
@@ -214,7 +215,7 @@ exports.RelationController.get('/get/:type/:id', async (request, response, next)
         else if (type == 'blog') {
             query = [
                 {
-                    $match: { question_id: ObjectId(id), type: "blog" }
+                    $match: { topic_id: ObjectId(id), type: "blog" }
                 },
                 {
                     $lookup: {
@@ -226,14 +227,15 @@ exports.RelationController.get('/get/:type/:id', async (request, response, next)
                 },
                 {
                     $lookup: {
-                        from: "questions",
-                        localField: "question_id",
+                        from: "topics",
+                        localField: "topic_id",
                         foreignField: "_id",
-                        as: "questions"
+                        as: "topics"
                     }
                 }
             ];
         }
+        console.log("query>>>>>>>>>>>>>", query);
         await models_1.RelationModel.aggregate(query)
             .then((values) => {
             if (values) {
