@@ -7,7 +7,7 @@ const express_validator_1 = require("express-validator");
 exports.TopicController = (0, express_1.Router)();
 console.log("<=========================topic -===============>");
 // Authguard,
-exports.TopicController.post('/add', (0, express_validator_1.check)('name').not().isEmpty().withMessage('Topic is required'), (0, express_validator_1.check)('description').not().isEmpty().withMessage('Description is required'), (0, express_validator_1.check)('slug').not().isEmpty().withMessage('slug is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), async (request, response, next) => {
+exports.TopicController.post('/add', (0, express_validator_1.check)('name').not().isEmpty().withMessage('Topic is required'), (0, express_validator_1.check)('description').not().isEmpty().withMessage('Description is required'), (0, express_validator_1.check)('slug').not().isEmpty().withMessage('slug is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), (0, express_validator_1.check)('home_tagline').not().isEmpty().withMessage('home_tagline is required'), async (request, response, next) => {
     try {
         console.log("<=========================try -===============>");
         var ObjectId = require('mongodb').ObjectId;
@@ -32,7 +32,11 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
                         name: body.name,
                         description: body.description,
                         slug: body.slug,
-                        user_id: ObjectId(body.user_id)
+                        user_id: ObjectId(body.user_id),
+                        index_no: body.index_no,
+                        home_tagline: body.home_tagline,
+                        homeTaglineIcon: body.homeTaglineIcon,
+                        showFeatures: body.showFeatures,
                     };
                 }
                 else {
@@ -41,7 +45,11 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
                         description: body.description,
                         slug: body.slug,
                         user_id: ObjectId(body.user_id),
-                        parent_id: ObjectId(body.parent_id)
+                        parent_id: ObjectId(body.parent_id),
+                        index_no: body.index_no,
+                        home_tagline: body.home_tagline,
+                        homeTaglineIcon: body.homeTaglineIcon,
+                        showFeatures: body.showFeatures,
                     };
                 }
                 new models_1.TopicModel(topicData).save(function (err, data) {
@@ -267,6 +275,7 @@ exports.TopicController.put('/', async (request, response, next) => {
         }
         console.log("query>>>>>>>>", query);
         await models_1.TopicModel.aggregate(query)
+            .sort({ index_no: -1 })
             .skip((page - 1) * limit)
             .limit(limit * 1)
             .then((val) => {

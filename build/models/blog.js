@@ -23,6 +23,9 @@ const BlogSchema = new mongoose_1.Schema({
     user_id: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Users'
+    },
+    category: {
+        type: String
     }
 }, { timestamps: true });
 exports.BlogModel = (0, mongoose_1.model)("blogs", BlogSchema);

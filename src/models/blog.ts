@@ -20,7 +20,11 @@ const BlogSchema = new Schema({
     user_id: {
         type: Schema.Types.ObjectId,
         ref: 'Users'
+    },
+    category: {
+        type: String
     }
+
 
 }, { timestamps: true });
 

@@ -24,6 +24,19 @@ const TopicSchema = new mongoose_1.Schema({
     showNav: {
         type: Boolean,
         default: 0
+    },
+    index_no: {
+        type: String,
+    },
+    home_tagline: {
+        type: String,
+    },
+    homeTaglineIcon: {
+        type: String,
+    },
+    showFeatures: {
+        type: Boolean,
+        default: 0
     }
 }, { timestamps: true });
 TopicSchema.plugin(mongoosePaginate);

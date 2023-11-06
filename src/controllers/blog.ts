@@ -13,6 +13,7 @@ BlogController.post(
   check("status").not().isEmpty().withMessage("Status is required"),
   // check("question_id").not().isEmpty().withMessage("question_id is required"),
   check("user_id").not().isEmpty().withMessage("user_id is required"),
+  check("category").not().isEmpty().withMessage("category is required"),
   async (request: Request, response: Response, next: NextFunction) => {
     try {
       const errors = validationResult(request);
@@ -37,6 +38,7 @@ BlogController.post(
             status: body.status,
             question_id: body.question_id,
             user_id: body.user_id,
+            category: body.category,
           });
           QuestionData.save(function (err, data) {
             if (data) {

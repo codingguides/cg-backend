@@ -8,7 +8,7 @@ export const FrontendController = Router();
 FrontendController.get('/get-menu', async (request: Request, response: Response, next: NextFunction) => {
   try {
 
-    await TopicModel.find({ "showNav": true }).then((val) => {
+    await TopicModel.find({ "showNav": true }).sort({ index_no: 1 }).then((val) => {
       if (val) {
         response.status(200).send({
           "status": "SUCCESS",
@@ -29,10 +29,34 @@ FrontendController.get('/get-menu', async (request: Request, response: Response,
   }
 });
 
+FrontendController.get('/get-feature-item', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+
+    await TopicModel.find({ "showFeatures": true }).sort({ index_no: 1 }).then((val) => {
+      if (val) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Features details successfully",
+          "payload": val
+        });
+      } else {
+        response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! features not found."
+        });
+      }
+
+    })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
 FrontendController.get('/get-sidebar-menu', async (request: Request, response: Response, next: NextFunction) => {
   try {
 
-    
+
     async function buildCategoryTree(categories) {
       const categoryMap = {}; // Use a map for faster lookups
 
@@ -41,9 +65,9 @@ FrontendController.get('/get-sidebar-menu', async (request: Request, response: R
         categoryMap[category._id] = category;
         category.children = [];
       });
-      
+
       const tree = [];
-    
+
       // Organize categories into a tree structure
       categories.forEach(category => {
         if (category.parent_id) {
@@ -55,24 +79,24 @@ FrontendController.get('/get-sidebar-menu', async (request: Request, response: R
           tree.push(category);
         }
       });
-    
+
       return tree;
     }
-    
+
 
     let cateList = []
     let obj = {}
-    await TopicModel.find().then((topicList)=>{
-      topicList.map((topic)=>{
+    await TopicModel.find().then((topicList) => {
+      topicList.map((topic) => {
 
-        if(topic.parent_id){
+        if (topic.parent_id) {
           obj = {
             _id: String(topic._id),
             name: String(topic.name),
             slug: String(topic.slug),
             parent_id: String(topic.parent_id)
           }
-        }else{
+        } else {
           obj = {
             _id: String(topic._id),
             name: String(topic.name),
@@ -82,20 +106,20 @@ FrontendController.get('/get-sidebar-menu', async (request: Request, response: R
         cateList.push(obj)
       })
     })
-    
+
     const categoryTree = await buildCategoryTree(cateList);
-      if(categoryTree){ 
-        response.status(200).send({
-          "status": "SUCCESS",
-          "msg": "Topics details successfully",
-          "payload": categoryTree
-        });
-      } else {
-        response.status(404).send({
-          "status": "ERROR",
-          "msg": "Oops! topic not found."
-        });
-      }
+    if (categoryTree) {
+      response.status(200).send({
+        "status": "SUCCESS",
+        "msg": "Topics details successfully",
+        "payload": categoryTree
+      });
+    } else {
+      response.status(404).send({
+        "status": "ERROR",
+        "msg": "Oops! topic not found."
+      });
+    }
 
   } catch (error) {
     next(error)
@@ -242,7 +266,7 @@ FrontendController.post('/newsletter', body('email', "Invalid Email!").isEmail()
         next(error)
       }
     }
-});
+  });
 
 FrontendController.get('/blog', async (request: Request, response: Response, next: NextFunction) => {
   try {

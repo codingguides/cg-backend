@@ -14,6 +14,7 @@ TopicController.post('/add',
   check('description').not().isEmpty().withMessage('Description is required'),
   check('slug').not().isEmpty().withMessage('slug is required'),
   check('user_id').not().isEmpty().withMessage('user_id is required'),
+  check('home_tagline').not().isEmpty().withMessage('home_tagline is required'),
   async (request: Request, response: Response, next: NextFunction) => {
     try {
       console.log("<=========================try -===============>");
@@ -39,7 +40,12 @@ TopicController.post('/add',
               name: body.name,
               description: body.description,
               slug: body.slug,
-              user_id: ObjectId(body.user_id)
+              user_id: ObjectId(body.user_id),
+              index_no: body.index_no,
+              home_tagline: body.home_tagline,
+              homeTaglineIcon: body.homeTaglineIcon,
+              showFeatures: body.showFeatures,
+
             }
           } else {
             topicData = {
@@ -47,7 +53,11 @@ TopicController.post('/add',
               description: body.description,
               slug: body.slug,
               user_id: ObjectId(body.user_id),
-              parent_id: ObjectId(body.parent_id)
+              parent_id: ObjectId(body.parent_id),
+              index_no: body.index_no,
+              home_tagline: body.home_tagline,
+              homeTaglineIcon: body.homeTaglineIcon,
+              showFeatures: body.showFeatures,
             }
           }
 
@@ -289,6 +299,7 @@ TopicController.put('/', async (request: Request, response: Response, next: Next
     console.log("query>>>>>>>>", query)
 
     await TopicModel.aggregate(query)
+      .sort({ index_no: -1 })
       .skip((page - 1) * limit)
       .limit(limit * 1)
       .then((val) => {

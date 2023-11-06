@@ -16,13 +16,27 @@ const TopicSchema = new Schema({
         ref: 'Topics'
     },
     user_id: {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'Users'
     },
-    showNav:{
+    showNav: {
+        type: Boolean,
+        default: 0
+    },
+    index_no: {
+        type: String,
+    },
+    home_tagline: {
+        type: String,
+    },
+    homeTaglineIcon: {
+        type: String,
+    },
+    showFeatures: {
         type: Boolean,
         default: 0
     }
+
 
 }, { timestamps: true });
 
