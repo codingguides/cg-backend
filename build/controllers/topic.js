@@ -37,6 +37,7 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
                         home_tagline: body.home_tagline,
                         homeTaglineIcon: body.homeTaglineIcon,
                         showFeatures: body.showFeatures,
+                        featureImg: body.featureImg,
                     };
                 }
                 else {
@@ -50,6 +51,7 @@ exports.TopicController.post('/add', (0, express_validator_1.check)('name').not(
                         home_tagline: body.home_tagline,
                         homeTaglineIcon: body.homeTaglineIcon,
                         showFeatures: body.showFeatures,
+                        featureImg: body.featureImg,
                     };
                 }
                 new models_1.TopicModel(topicData).save(function (err, data) {

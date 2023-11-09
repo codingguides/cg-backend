@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { QuestionModel, RelationModel, NewsletterModel, TopicModel, BlogModel } from "../../models";
+import { QuestionModel, RelationModel, NewsletterModel, TopicModel, BlogModel, TagsModel } from "../../models";
 import { body, validationResult } from "express-validator";
 import { isEmpty } from "lodash";
 
@@ -159,6 +159,48 @@ FrontendController.get('/get-quiz-list/:slug', async (request: Request, response
         response.status(200).send({
           "status": "ERROR",
           "msg": "Oops! slug not found."
+        });
+      }
+    })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
+FrontendController.get('/search/:topic', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { topic } = request.params;
+    await TagsModel.aggregate([
+      { $match:{'name': {'$regex': topic.toUpperCase() }, type: 'topic' }},
+      {
+        $lookup: {
+          from: "topics",
+          localField: "topic_id",
+          foreignField: "_id",
+          as: "topicDetails"
+        },
+      }
+    ]).then(async (val) => {
+      console.log(val)
+      let newarray = [];
+      if (val) {
+        val.map(async (value)=>{ 
+          if(value.topicDetails.length > 0){
+            if(value.topicDetails[0].parent_id == null){
+              await newarray.push(value.topicDetails[0]);
+            }
+          }   
+        })
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Topics details successfully",
+          "payload": newarray
+        });
+      } else {
+        response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! topic not found."
         });
       }
     })

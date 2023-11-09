@@ -37,6 +37,9 @@ const TopicSchema = new mongoose_1.Schema({
     showFeatures: {
         type: Boolean,
         default: 0
+    },
+    featureImg: {
+        type: String,
     }
 }, { timestamps: true });
 TopicSchema.plugin(mongoosePaginate);

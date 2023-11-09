@@ -45,7 +45,8 @@ TopicController.post('/add',
               home_tagline: body.home_tagline,
               homeTaglineIcon: body.homeTaglineIcon,
               showFeatures: body.showFeatures,
-
+              featureImg: body.featureImg,
+              
             }
           } else {
             topicData = {
@@ -58,6 +59,8 @@ TopicController.post('/add',
               home_tagline: body.home_tagline,
               homeTaglineIcon: body.homeTaglineIcon,
               showFeatures: body.showFeatures,
+              featureImg: body.featureImg,
+
             }
           }
 

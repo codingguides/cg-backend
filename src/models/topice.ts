@@ -35,6 +35,9 @@ const TopicSchema = new Schema({
     showFeatures: {
         type: Boolean,
         default: 0
+    },
+    featureImg: {
+        type: String,
     }
 
 
