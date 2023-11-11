@@ -334,6 +334,7 @@ FrontendController.get('/blog', async (request: Request, response: Response, nex
   }
 });
 
+// For forntend example details page
 FrontendController.get('/blog/:slug', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { slug } = request.params;

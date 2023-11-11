@@ -223,6 +223,7 @@ BlogController.get(
 
 // ===================================================================== //
 
+// Get blog relation api
 BlogController.get(
   "/get/category/:category",
   async (request: Request, response: Response, next: NextFunction) => {
@@ -249,6 +250,7 @@ BlogController.get(
   }
 );
 
+// Blog category add vai api
 BlogController.post(
   "/category/add",
   check("category").not().isEmpty().withMessage("category is required"),
