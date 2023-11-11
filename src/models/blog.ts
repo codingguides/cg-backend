@@ -21,11 +21,14 @@ const BlogSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Users'
     },
-    category: {
-        type: String
+    category_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Blogcategory'
+    },
+    topic_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Topics'
     }
-
-
 }, { timestamps: true });
 
 export const BlogModel = model("blogs", BlogSchema);

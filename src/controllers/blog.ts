@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { BlogModel } from "../models";
+import { BlogModel, BlogCategoryModel } from "../models";
 import { check, body, validationResult } from "express-validator";
 
 export const BlogController = Router();
@@ -13,7 +13,7 @@ BlogController.post(
   check("status").not().isEmpty().withMessage("Status is required"),
   // check("question_id").not().isEmpty().withMessage("question_id is required"),
   check("user_id").not().isEmpty().withMessage("user_id is required"),
-  check("category").not().isEmpty().withMessage("category is required"),
+  check("category_id").not().isEmpty().withMessage("category id is required"),
   async (request: Request, response: Response, next: NextFunction) => {
     try {
       const errors = validationResult(request);
@@ -38,7 +38,8 @@ BlogController.post(
             status: body.status,
             question_id: body.question_id,
             user_id: body.user_id,
-            category: body.category,
+            category_id: body.category_id,
+            topic_id: body.topic_id
           });
           QuestionData.save(function (err, data) {
             if (data) {
@@ -132,36 +133,6 @@ BlogController.delete(
 );
 
 BlogController.get(
-  "/get/:id",
-  async (request: Request, response: Response, next: NextFunction) => {
-    try {
-      const { id } = request.params;
-      var ObjectId = require("mongodb").ObjectId;
-      var _id = new ObjectId(id);
-
-      const query = { _id: ObjectId(_id) };
-
-      await BlogModel.findOne(query).then((val) => {
-        if (val) {
-          response.status(200).send({
-            status: "SUCCESS",
-            msg: "Blog details successfully",
-            payload: val,
-          });
-        } else {
-          response.status(404).send({
-            status: "ERROR",
-            msg: "Oops! Blog not found.",
-          });
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
-BlogController.get(
   "/",
   async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -224,3 +195,103 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
     next(error)
   }
 });
+
+BlogController.get(
+  "/",
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      await BlogModel.find().then((val) => {
+        if (val) {
+          response.status(200).send({
+            status: "SUCCESS",
+            msg: "Blog details successfully",
+            payload: val,
+          });
+        } else {
+          response.status(404).send({
+            status: "ERROR",
+            msg: "Oops! Blog not found.",
+            payload: [],
+          });
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// ===================================================================== //
+
+BlogController.get(
+  "/get/category/:category",
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const { category } = request.params;
+
+      await BlogCategoryModel.find({"category": category}).then((val) => {
+        if (val) {
+          response.status(200).send({
+            status: "SUCCESS",
+            msg: "Category details successfully",
+            payload: val,
+          });
+        } else {
+          response.status(404).send({
+            status: "ERROR",
+            msg: "Oops! category not found.",
+          });
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+BlogController.post(
+  "/category/add",
+  check("category").not().isEmpty().withMessage("category is required"),
+  check("sub_category").not().isEmpty().withMessage("sub category is required"),
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const errors = validationResult(request);
+      if (!errors.isEmpty()) {
+        return response.status(400).json({ errors: errors.array() });
+      } else {
+        const { body } = request;
+        await BlogCategoryModel.syncIndexes();
+        const data = await BlogCategoryModel.find({ sub_category: body.sub_category });
+
+        if (data.length > 0) {
+          response.status(200).send({
+            success: false,
+            message: "Blog category already exists.",
+          });
+        } else {
+          let QuestionData = new BlogCategoryModel({
+            category: body.category,
+            sub_category: body.sub_category
+          });
+          QuestionData.save(function (err, data) {
+            if (data) {
+              response.status(200).send({
+                status: "SUCCESS",
+                msg: "Blog Added successfully",
+                payload: data,
+              });
+            } else {
+              response.status(404).send({
+                status: "ERROR",
+                msg: "Oops! something wrong",
+                err,
+              });
+            }
+          });
+        }
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);

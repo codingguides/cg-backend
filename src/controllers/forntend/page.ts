@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { QuestionModel, RelationModel, NewsletterModel, TopicModel, BlogModel, TagsModel } from "../../models";
+import { QuestionModel, RelationModel, NewsletterModel, TopicModel, BlogModel, TagsModel, BlogCategoryModel } from "../../models";
 import { body, validationResult } from "express-validator";
 import { isEmpty } from "lodash";
 
@@ -338,13 +338,46 @@ FrontendController.get('/blog/:slug', async (request: Request, response: Respons
   try {
     const { slug } = request.params;
 
-    await BlogModel.find({ "slug": slug }).then((val) => {
+    await TopicModel.findOne({ "slug": slug }).then(async (val) => {
       if (val) {
-        response.status(200).send({
-          "status": "SUCCESS",
-          "msg": "Blog details successfully",
-          "payload": val
-        });
+        await BlogCategoryModel.syncIndexes();
+        await BlogCategoryModel.aggregate([
+          { $match:{'category': {'$regex': slug } }},
+          {
+            $lookup: {
+              from: "blogs",
+              localField: "_id",
+              foreignField: "category_id",
+              as: "blogDetails"
+            },
+          },
+          { $sort: { category: 1 } }
+        ]).then(async (res) => {
+
+          const categoryMap = {};
+          res.forEach(category => {
+            categoryMap[category.sub_category] = category;
+          });
+
+          if(res){
+            response.status(200).send({
+              "status": "SUCCESS",
+              "msg": "Blog details successfully",
+              "payload": {
+                "topic": val,
+                "relation": categoryMap
+              }
+            });
+          } else {
+            response.status(200).send({
+              "status": "ERROR",
+              "msg": "Oops! Relation not found."
+            });
+          }
+          
+        })
+
+        
       } else {
         response.status(200).send({
           "status": "ERROR",

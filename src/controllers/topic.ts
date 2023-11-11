@@ -46,7 +46,7 @@ TopicController.post('/add',
               homeTaglineIcon: body.homeTaglineIcon,
               showFeatures: body.showFeatures,
               featureImg: body.featureImg,
-              
+
             }
           } else {
             topicData = {
@@ -64,6 +64,9 @@ TopicController.post('/add',
             }
           }
 
+
+
+          
           new TopicModel(topicData).save(
             function (err, data) {
               if (data) {
