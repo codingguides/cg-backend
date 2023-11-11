@@ -5,9 +5,7 @@ const express_1 = require("express");
 const models_1 = require("../models");
 const express_validator_1 = require("express-validator");
 exports.BlogController = (0, express_1.Router)();
-exports.BlogController.post("/add", (0, express_validator_1.check)("title").not().isEmpty().withMessage("Title is required"), (0, express_validator_1.check)("slug").not().isEmpty().withMessage("Slug is required"), (0, express_validator_1.check)("description").not().isEmpty().withMessage("Description is required"), (0, express_validator_1.check)("feature_image").not().isEmpty().withMessage("Feature Image is required"), (0, express_validator_1.check)("status").not().isEmpty().withMessage("Status is required"), 
-// check("question_id").not().isEmpty().withMessage("question_id is required"),
-(0, express_validator_1.check)("user_id").not().isEmpty().withMessage("user_id is required"), (0, express_validator_1.check)("category_id").not().isEmpty().withMessage("category id is required"), async (request, response, next) => {
+exports.BlogController.post("/add", (0, express_validator_1.check)("title").not().isEmpty().withMessage("Title is required"), (0, express_validator_1.check)("slug").not().isEmpty().withMessage("Slug is required"), (0, express_validator_1.check)("description").not().isEmpty().withMessage("Description is required"), (0, express_validator_1.check)("status").not().isEmpty().withMessage("Status is required"), (0, express_validator_1.check)("user_id").not().isEmpty().withMessage("user_id is required"), (0, express_validator_1.check)("category_id").not().isEmpty().withMessage("category id is required"), async (request, response, next) => {
     try {
         const errors = (0, express_validator_1.validationResult)(request);
         if (!errors.isEmpty()) {
@@ -141,13 +139,55 @@ exports.BlogController.put('/', async (request, response, next) => {
         const count = await models_1.BlogModel.count();
         let query = [];
         if (type == "title") {
-            query = [{ $match: { title: { '$regex': search, '$options': 'i' } } }];
+            query = [
+                { $match: { title: { '$regex': search, '$options': 'i' } } },
+                {
+                    $lookup: {
+                        from: "blogcategory",
+                        localField: "category_id",
+                        foreignField: "_id",
+                        as: "blogRelationDetails"
+                    },
+                },
+            ];
         }
         else if (type == "slug") {
-            query = [{ $match: { slug: { '$regex': search, '$options': 'i' } } }];
+            query = [
+                { $match: { slug: { '$regex': search, '$options': 'i' } } },
+                {
+                    $lookup: {
+                        from: "blogcategory",
+                        localField: "category_id",
+                        foreignField: "_id",
+                        as: "blogRelationDetails"
+                    }
+                }
+            ];
         }
         else if (type == "status") {
-            query = [{ $match: { status: status } }];
+            query = [
+                { $match: { status: status } },
+                {
+                    $lookup: {
+                        from: "blogcategory",
+                        localField: "category_id",
+                        foreignField: "_id",
+                        as: "blogRelationDetails"
+                    }
+                }
+            ];
+        }
+        else {
+            query = [
+                {
+                    $lookup: {
+                        from: "blogcategory",
+                        localField: "_id",
+                        foreignField: "category_id",
+                        as: "blogRelationDetails"
+                    },
+                },
+            ];
         }
         await models_1.BlogModel.aggregate(query)
             .skip((page - 1) * limit)
@@ -199,6 +239,7 @@ exports.BlogController.get("/", async (request, response, next) => {
     }
 });
 // ===================================================================== //
+// Get blog relation api
 exports.BlogController.get("/get/category/:category", async (request, response, next) => {
     try {
         const { category } = request.params;
@@ -222,6 +263,7 @@ exports.BlogController.get("/get/category/:category", async (request, response, 
         next(error);
     }
 });
+// Blog category add vai api
 exports.BlogController.post("/category/add", (0, express_validator_1.check)("category").not().isEmpty().withMessage("category is required"), (0, express_validator_1.check)("sub_category").not().isEmpty().withMessage("sub category is required"), async (request, response, next) => {
     try {
         const errors = (0, express_validator_1.validationResult)(request);

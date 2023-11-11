@@ -9,9 +9,7 @@ BlogController.post(
   check("title").not().isEmpty().withMessage("Title is required"),
   check("slug").not().isEmpty().withMessage("Slug is required"),
   check("description").not().isEmpty().withMessage("Description is required"),
-  check("feature_image").not().isEmpty().withMessage("Feature Image is required"),
   check("status").not().isEmpty().withMessage("Status is required"),
-  // check("question_id").not().isEmpty().withMessage("question_id is required"),
   check("user_id").not().isEmpty().withMessage("user_id is required"),
   check("category_id").not().isEmpty().withMessage("category id is required"),
   async (request: Request, response: Response, next: NextFunction) => {
@@ -164,11 +162,52 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
     let query = []
 
     if (type == "title") {
-      query = [{ $match: { title: { '$regex': search, '$options': 'i' } } }]
+      query = [
+        { $match: { title: { '$regex': search, '$options': 'i' } } },
+        {
+          $lookup: {
+            from: "blogcategory",
+            localField: "category_id",
+            foreignField: "_id",
+            as: "blogRelationDetails"
+          },
+        },
+      ]
     } else if (type == "slug") {
-      query = [{ $match: { slug: { '$regex': search, '$options': 'i' } } }]
+      query = [
+        { $match: { slug: { '$regex': search, '$options': 'i' } } },
+        {
+          $lookup: {
+            from: "blogcategory",
+            localField: "category_id",
+            foreignField: "_id",
+            as: "blogRelationDetails"
+          }
+        }
+      ]
     } else if (type == "status") {
-      query = [{ $match: { status: status } }]
+      query = [
+        { $match: { status: status } },
+        {
+          $lookup: {
+            from: "blogcategory",
+            localField: "category_id",
+            foreignField: "_id",
+            as: "blogRelationDetails"
+          }
+        }
+      ]
+    }else{
+      query = [
+        {
+          $lookup: {
+            from: "blogcategory",
+            localField: "_id",
+            foreignField: "category_id",
+            as: "blogRelationDetails"
+          },
+        },
+      ]
     }
 
     await BlogModel.aggregate(query)
