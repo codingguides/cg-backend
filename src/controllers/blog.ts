@@ -157,7 +157,7 @@ BlogController.get(
 
 BlogController.put('/', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const { limit = 3, page = 1, type, search, status } = request.body;
+    const { limit = 3, page = 1, type, search, status, category } = request.body;
     const count = await BlogModel.count();
     let query = []
 
@@ -166,7 +166,7 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
         { $match: { title: { '$regex': search, '$options': 'i' } } },
         {
           $lookup: {
-            from: "blogcategory",
+            from: "blogcategories",
             localField: "category_id",
             foreignField: "_id",
             as: "blogRelationDetails"
@@ -178,7 +178,7 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
         { $match: { slug: { '$regex': search, '$options': 'i' } } },
         {
           $lookup: {
-            from: "blogcategory",
+            from: "blogcategories",
             localField: "category_id",
             foreignField: "_id",
             as: "blogRelationDetails"
@@ -190,7 +190,7 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
         { $match: { status: status } },
         {
           $lookup: {
-            from: "blogcategory",
+            from: "blogcategories",
             localField: "category_id",
             foreignField: "_id",
             as: "blogRelationDetails"
@@ -201,9 +201,9 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
       query = [
         {
           $lookup: {
-            from: "blogcategory",
-            localField: "_id",
-            foreignField: "category_id",
+            from: "blogcategories",
+            localField: "category_id",
+            foreignField: "_id",
             as: "blogRelationDetails"
           },
         },

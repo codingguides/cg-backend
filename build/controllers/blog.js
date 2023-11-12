@@ -135,7 +135,7 @@ exports.BlogController.get("/", async (request, response, next) => {
 });
 exports.BlogController.put('/', async (request, response, next) => {
     try {
-        const { limit = 3, page = 1, type, search, status } = request.body;
+        const { limit = 3, page = 1, type, search, status, category } = request.body;
         const count = await models_1.BlogModel.count();
         let query = [];
         if (type == "title") {
@@ -143,7 +143,7 @@ exports.BlogController.put('/', async (request, response, next) => {
                 { $match: { title: { '$regex': search, '$options': 'i' } } },
                 {
                     $lookup: {
-                        from: "blogcategory",
+                        from: "blogcategories",
                         localField: "category_id",
                         foreignField: "_id",
                         as: "blogRelationDetails"
@@ -156,7 +156,7 @@ exports.BlogController.put('/', async (request, response, next) => {
                 { $match: { slug: { '$regex': search, '$options': 'i' } } },
                 {
                     $lookup: {
-                        from: "blogcategory",
+                        from: "blogcategories",
                         localField: "category_id",
                         foreignField: "_id",
                         as: "blogRelationDetails"
@@ -169,7 +169,7 @@ exports.BlogController.put('/', async (request, response, next) => {
                 { $match: { status: status } },
                 {
                     $lookup: {
-                        from: "blogcategory",
+                        from: "blogcategories",
                         localField: "category_id",
                         foreignField: "_id",
                         as: "blogRelationDetails"
@@ -181,9 +181,9 @@ exports.BlogController.put('/', async (request, response, next) => {
             query = [
                 {
                     $lookup: {
-                        from: "blogcategory",
-                        localField: "_id",
-                        foreignField: "category_id",
+                        from: "blogcategories",
+                        localField: "category_id",
+                        foreignField: "_id",
                         as: "blogRelationDetails"
                     },
                 },
