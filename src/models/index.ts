@@ -9,3 +9,4 @@ export * from "./blog";
 export * from "./quizAnalytics";
 export * from "./newsletter";
 export * from "./blogcategory";
+export * from "./userAnalytics";

@@ -375,6 +375,4 @@ UserController.post(
         next(error)
       }
     }
-  });
-
-
+});

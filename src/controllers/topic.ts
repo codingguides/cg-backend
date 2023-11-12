@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { QuestionModel, RelationModel, TagsModel, TopicModel } from "../models";
+import { QuestionModel, RelationModel, TagsModel, TopicModel, UserAnalyticsModel } from "../models";
 import { check, body, validationResult } from 'express-validator';
 import { getIdBySlug } from '../common';
 
@@ -66,7 +66,7 @@ TopicController.post('/add',
 
 
 
-          
+
           new TopicModel(topicData).save(
             function (err, data) {
               if (data) {
@@ -348,6 +348,89 @@ TopicController.get('/list', async (request: Request, response: Response, next: 
       }
 
     })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
+
+// After quiz complect this api call if user logedIN
+TopicController.post('/analytics',
+  check('topic_id').not().isEmpty().withMessage('topic_id is required'),
+  check('user_id').not().isEmpty().withMessage('user_id is required'),
+  check('attendedQuestionCount').not().isEmpty().withMessage('attendedQuestionCount is required'),
+  check('attendedAnswerCount').not().isEmpty().withMessage('attendedAnswerCount is required'),
+  check('rightAnswerCount').not().isEmpty().withMessage('rightAnswerCount is required'),
+  check('status').not().isEmpty().withMessage('status is required'),
+  check('point').not().isEmpty().withMessage('point is required'),
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      var ObjectId = require('mongodb').ObjectId;
+      const errors = validationResult(request);
+      if (!errors.isEmpty()) {
+        return response.status(400).json({ errors: errors.array() });
+      } else {
+        const { body } = request;
+        await UserAnalyticsModel.syncIndexes();
+        let topicData = {
+          topic_id: body.topic_id,
+          user_id: body.user_id,
+          attendedQuestionCount: body.attendedQuestionCount,
+          attendedAnswerCount: ObjectId(body.attendedAnswerCount),
+          rightAnswerCount: ObjectId(body.rightAnswerCount),
+          status: body.status,
+          point: body.point
+        }
+
+        new UserAnalyticsModel(topicData).save(
+          function (err, data) {
+            if (data) {
+              response.status(200).send({
+                "status": "SUCCESS",
+                "msg": "User relation Added successfully",
+                "payload": data
+              });
+            } else {
+              response.status(404).send({
+                "status": "ERROR",
+                "msg": "Oops! User relation something wrong",
+                err
+              });
+            }
+          }
+        );
+      }
+    } catch (error) {
+      next(error)
+    }
+});
+
+// Get user analytics by id 
+TopicController.get('/user/analytics/:user_id', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { user_id } = request.params;
+    var ObjectId = require('mongodb').ObjectId;
+
+    await UserAnalyticsModel.aggregate([
+      {
+        $match: { user_id: ObjectId(user_id) }
+      }
+    ])
+      .then((val) => {
+        if (val) {
+          response.status(200).send({
+            "status": "SUCCESS",
+            "msg": "Analytics details successfully get",
+            "payload": val
+          });
+        } else {
+          response.status(200).send({
+            "status": "ERROR",
+            "msg": "Oops! analytics not found."
+          });
+        }
+      })
 
   } catch (error) {
     next(error)
