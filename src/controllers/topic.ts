@@ -404,7 +404,7 @@ TopicController.post('/analytics',
     } catch (error) {
       next(error)
     }
-});
+  });
 
 // Get user analytics by id 
 TopicController.get('/user/analytics/:user_id', async (request: Request, response: Response, next: NextFunction) => {

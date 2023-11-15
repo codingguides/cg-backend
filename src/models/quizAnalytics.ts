@@ -1,17 +1,17 @@
 import { Schema, model } from "mongoose";
 const quizAnalyticsSchema = new Schema({
-    topic_id: {
-        type: Schema.Types.ObjectId,
+    topic_slug: {
+        type: String,
         ref: 'Topics'
     },
     user_id: {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'Users'
     },
-    rating:{
+    rating: {
         type: String
     },
-    status:{
+    status: {
         type: String,
         enum: ["completed", "not-completed"],
     }
