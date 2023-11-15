@@ -25,4 +25,5 @@ __exportStar(require("./blog"), exports);
 __exportStar(require("./quizAnalytics"), exports);
 __exportStar(require("./newsletter"), exports);
 __exportStar(require("./blogcategory"), exports);
+__exportStar(require("./userAnalytics"), exports);
 //# sourceMappingURL=index.js.map

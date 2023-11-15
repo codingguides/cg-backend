@@ -131,6 +131,48 @@ BlogController.delete(
 );
 
 BlogController.get(
+  "/get/:id",
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const { id } = request.params;
+      var ObjectId = require("mongodb").ObjectId;
+      var _id = new ObjectId(id);
+
+      const query = { _id: ObjectId(_id) };
+
+      // await BlogModel.findOne(query)
+      await BlogModel.aggregate([
+        { $match: { '_id': ObjectId(id) } },
+        {
+          $lookup: {
+            from: "blogcategories",
+            localField: "category_id",
+            foreignField: "_id",
+            as: "catDetails"
+          },
+        },
+      ])
+        .then((val) => {
+          if (val) {
+            response.status(200).send({
+              status: "SUCCESS",
+              msg: "Blog details successfully",
+              payload: val,
+            });
+          } else {
+            response.status(404).send({
+              status: "ERROR",
+              msg: "Oops! Blog not found.",
+            });
+          }
+        });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+BlogController.get(
   "/",
   async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -197,7 +239,7 @@ BlogController.put('/', async (request: Request, response: Response, next: NextF
           }
         }
       ]
-    }else{
+    } else {
       query = [
         {
           $lookup: {
@@ -269,7 +311,7 @@ BlogController.get(
     try {
       const { category } = request.params;
 
-      await BlogCategoryModel.find({"category": category}).then((val) => {
+      await BlogCategoryModel.find({ "category": category }).then((val) => {
         if (val) {
           response.status(200).send({
             status: "SUCCESS",

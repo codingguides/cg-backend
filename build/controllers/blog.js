@@ -110,6 +110,44 @@ exports.BlogController.delete("/delete/:id", async (request, response, next) => 
         next(error);
     }
 });
+exports.BlogController.get("/get/:id", async (request, response, next) => {
+    try {
+        const { id } = request.params;
+        var ObjectId = require("mongodb").ObjectId;
+        var _id = new ObjectId(id);
+        const query = { _id: ObjectId(_id) };
+        // await BlogModel.findOne(query)
+        await models_1.BlogModel.aggregate([
+            { $match: { '_id': ObjectId(id) } },
+            {
+                $lookup: {
+                    from: "blogcategories",
+                    localField: "category_id",
+                    foreignField: "_id",
+                    as: "catDetails"
+                },
+            },
+        ])
+            .then((val) => {
+            if (val) {
+                response.status(200).send({
+                    status: "SUCCESS",
+                    msg: "Blog details successfully",
+                    payload: val,
+                });
+            }
+            else {
+                response.status(404).send({
+                    status: "ERROR",
+                    msg: "Oops! Blog not found.",
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.BlogController.get("/", async (request, response, next) => {
     try {
         await models_1.BlogModel.find().then((val) => {
