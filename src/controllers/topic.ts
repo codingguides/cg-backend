@@ -374,7 +374,7 @@ TopicController.post('/analytics',
         const { body } = request;
         await UserAnalyticsModel.syncIndexes();
         let topicData = {
-          topic_id: body.topic_slug,
+          topic_slug: body.topic_slug,
           user_id: body.user_id,
           attendedQuestionCount: body.attendedQuestionCount,
           attendedAnswerCount: body.attendedAnswerCount,
