@@ -11,14 +11,11 @@ const UserAnalyticsSchema = new Schema({
     attendedQuestionCount: {
         type: String,
     },
-    attendedAnswerCount: {
-        type: String,
-    },
     rightAnswerCount: {
         type: String,
     },
-    status:{
-        type:String,
+    status: {
+        type: String,
         enum: ["pass", "failed", "not completed"],
     },
     point: {
