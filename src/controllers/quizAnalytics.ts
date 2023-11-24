@@ -7,7 +7,7 @@ export const QuizAnalyticsController = Router();
 
 QuizAnalyticsController.post('/add',
 
-  check('topic_slug').not().isEmpty().withMessage('topic_slug is required'),
+  check('topic_id').not().isEmpty().withMessage('topic_id is required'),
   check('user_id').not().isEmpty().withMessage('user_id is required'),
   check('rating').not().isEmpty().withMessage('rating is required'),
   check('status').not().isEmpty().withMessage('status is required'),
@@ -23,7 +23,7 @@ QuizAnalyticsController.post('/add',
         await QuizAnalyticsModel.syncIndexes();
 
         let QuizAnalyticsData = new QuizAnalyticsModel({
-          topic_slug: body.topic_slug,
+          topic_id: body.topic_id,
           user_id: body.user_id,
           rating: body.rating,
           status: body.status

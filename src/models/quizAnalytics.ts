@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 const quizAnalyticsSchema = new Schema({
-    topic_slug: {
+    topic_id: {
         type: String,
         ref: 'Topics'
     },
