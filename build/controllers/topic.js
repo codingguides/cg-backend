@@ -326,7 +326,7 @@ exports.TopicController.get('/list', async (request, response, next) => {
     }
 });
 // After quiz complect this api call if user logedIN
-exports.TopicController.post('/analytics', (0, express_validator_1.check)('topic_id').not().isEmpty().withMessage('topic_id is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), (0, express_validator_1.check)('attendedQuestionCount').not().isEmpty().withMessage('attendedQuestionCount is required'), (0, express_validator_1.check)('rightAnswerCount').not().isEmpty().withMessage('rightAnswerCount is required'), (0, express_validator_1.check)('status').not().isEmpty().withMessage('status is required'), (0, express_validator_1.check)('point').not().isEmpty().withMessage('point is required'), async (request, response, next) => {
+exports.TopicController.post('/analytics', (0, express_validator_1.check)('topic_url').not().isEmpty().withMessage('topic_url is required'), (0, express_validator_1.check)('topic_id').not().isEmpty().withMessage('topic_id is required'), (0, express_validator_1.check)('user_id').not().isEmpty().withMessage('user_id is required'), (0, express_validator_1.check)('attendedQuestionCount').not().isEmpty().withMessage('attendedQuestionCount is required'), (0, express_validator_1.check)('rightAnswerCount').not().isEmpty().withMessage('rightAnswerCount is required'), (0, express_validator_1.check)('status').not().isEmpty().withMessage('status is required'), (0, express_validator_1.check)('point').not().isEmpty().withMessage('point is required'), async (request, response, next) => {
     try {
         var ObjectId = require('mongodb').ObjectId;
         const errors = (0, express_validator_1.validationResult)(request);
@@ -337,6 +337,7 @@ exports.TopicController.post('/analytics', (0, express_validator_1.check)('topic
             const { body } = request;
             await models_1.UserAnalyticsModel.syncIndexes();
             let topicData = {
+                topic_url: body.topic_url,
                 topic_id: body.topic_id,
                 user_id: body.user_id,
                 attendedQuestionCount: body.attendedQuestionCount,
@@ -394,6 +395,7 @@ exports.TopicController.get('/user-analytics/:user_id', async (request, response
                         return {
                             "_id": value._id,
                             "topic_id": value.topic_id,
+                            "topic_url": value.topic_url,
                             "topic_name": value.topicDetails[0].name,
                             "topic_slug": value.topicDetails[0].slug,
                             "user_id": value.user_id,
