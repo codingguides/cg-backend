@@ -357,7 +357,7 @@ TopicController.get('/list', async (request: Request, response: Response, next: 
 
 // After quiz complect this api call if user logedIN
 TopicController.post('/analytics',
-  check('topic_slug').not().isEmpty().withMessage('topic_slug is required'),
+  check('topic_id').not().isEmpty().withMessage('topic_id is required'),
   check('user_id').not().isEmpty().withMessage('user_id is required'),
   check('attendedQuestionCount').not().isEmpty().withMessage('attendedQuestionCount is required'),
   check('rightAnswerCount').not().isEmpty().withMessage('rightAnswerCount is required'),
@@ -373,7 +373,7 @@ TopicController.post('/analytics',
         const { body } = request;
         await UserAnalyticsModel.syncIndexes();
         let topicData = {
-          topic_slug: body.topic_slug,
+          topic_id: body.topic_id,
           user_id: body.user_id,
           attendedQuestionCount: body.attendedQuestionCount,
           rightAnswerCount: body.rightAnswerCount,
