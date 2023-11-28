@@ -373,6 +373,7 @@ TopicController.post('/analytics',
         const { body } = request;
         await UserAnalyticsModel.syncIndexes();
         let topicData = {
+          topic_url: body.topic_url,
           topic_id: body.topic_id,
           user_id: body.user_id,
           attendedQuestionCount: body.attendedQuestionCount,
@@ -434,8 +435,9 @@ TopicController.get('/user-analytics/:user_id', async (request: Request, respons
               return {
                 "_id": value._id,
                 "topic_id": value.topic_id,
-                "topic_name": value.name,
-                "topic_slug": value.slug,
+                "topic_url": value.topic_url,
+                "topic_name": value.topicDetails[0].name,
+                "topic_slug": value.topicDetails[0].slug,
                 "user_id": value.user_id,
                 "attendedQuestionCount": value.attendedQuestionCount,
                 "rightAnswerCount": value.rightAnswerCount,

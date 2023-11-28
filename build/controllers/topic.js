@@ -394,8 +394,8 @@ exports.TopicController.get('/user-analytics/:user_id', async (request, response
                         return {
                             "_id": value._id,
                             "topic_id": value.topic_id,
-                            "topic_name": value.name,
-                            "topic_slug": value.slug,
+                            "topic_name": value.topicDetails[0].name,
+                            "topic_slug": value.topicDetails[0].slug,
                             "user_id": value.user_id,
                             "attendedQuestionCount": value.attendedQuestionCount,
                             "rightAnswerCount": value.rightAnswerCount,
