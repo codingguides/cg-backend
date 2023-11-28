@@ -405,14 +405,24 @@ TopicController.post('/analytics',
   });
 
 // Get user analytics by id 
-TopicController.get('/user/analytics/:user_id', async (request: Request, response: Response, next: NextFunction) => {
+TopicController.get('/user-analytics/:user_id', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { user_id } = request.params;
     var ObjectId = require('mongodb').ObjectId;
 
+    console.log("user_id>>>>>>>>>",user_id)
+
     await UserAnalyticsModel.aggregate([
       {
-        $match: { user_id: ObjectId(user_id) }
+        $match: { user_id: ObjectId(user_id) },
+      },
+      {
+        $lookup: {
+          from: "topics",
+          localField: "topic_id",
+          foreignField: "_id",
+          as: "topicDetails"
+        },
       }
     ])
       .then((val) => {
@@ -420,7 +430,19 @@ TopicController.get('/user/analytics/:user_id', async (request: Request, respons
           response.status(200).send({
             "status": "SUCCESS",
             "msg": "Analytics details successfully get",
-            "payload": val
+            "payload": val.map((value)=>{
+              return {
+                "_id": value._id,
+                "topic_id": value.topic_id,
+                "topic_name": value.name,
+                "topic_slug": value.slug,
+                "user_id": value.user_id,
+                "attendedQuestionCount": value.attendedQuestionCount,
+                "rightAnswerCount": value.rightAnswerCount,
+                "status": value.status,
+                "point": value.point,
+              }
+            })
           });
         } else {
           response.status(200).send({
