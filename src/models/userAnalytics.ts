@@ -8,6 +8,9 @@ const UserAnalyticsSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Topics'
     },
+    topic_url: {
+        type: String,
+    },
     attendedQuestionCount: {
         type: String,
     },
