@@ -84,7 +84,7 @@ UserController.post(
       }
     }
 
-  });
+});
 
 /*
 ** API NAME: User forgot password by id
