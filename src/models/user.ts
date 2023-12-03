@@ -22,6 +22,18 @@ const UserSchema = new Schema({
     lastlogindate: { 
         type: String 
     },
+    organization:{
+        type: String 
+    },
+    birthday:{
+        type: String 
+    },
+    location:{
+        type: String 
+    },
+    profile_pic:{
+        type: String 
+    },
 }, { timestamps: true });
 
 export const UserModel = model("users", UserSchema);

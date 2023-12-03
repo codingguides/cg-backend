@@ -368,8 +368,10 @@ exports.TopicController.post('/analytics', (0, express_validator_1.check)('topic
     }
 });
 // Get user analytics by id 
-exports.TopicController.get('/user-analytics/:user_id', async (request, response, next) => {
+exports.TopicController.put('/user-analytics/:user_id', async (request, response, next) => {
     try {
+        const { limit = 5, page = 1, type, search } = request.body;
+        const count = await models_1.TopicModel.count();
         const { user_id } = request.params;
         var ObjectId = require('mongodb').ObjectId;
         console.log("user_id>>>>>>>>>", user_id);
@@ -386,11 +388,14 @@ exports.TopicController.get('/user-analytics/:user_id', async (request, response
                 },
             }
         ])
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit * 1)
             .then((val) => {
             if (val) {
                 response.status(200).send({
                     "status": "SUCCESS",
-                    "msg": "Analytics details successfully get",
+                    "msg": "Analytics details successfully",
                     "payload": val.map((value) => {
                         return {
                             "_id": value._id,
@@ -403,14 +408,18 @@ exports.TopicController.get('/user-analytics/:user_id', async (request, response
                             "rightAnswerCount": value.rightAnswerCount,
                             "status": value.status,
                             "point": value.point,
+                            "createdAt": value.createdAt
                         };
-                    })
+                    }),
+                    "totalPages": Math.ceil(count / limit),
+                    "currentPage": page
                 });
             }
             else {
-                response.status(200).send({
+                response.status(404).send({
                     "status": "ERROR",
-                    "msg": "Oops! analytics not found."
+                    "msg": "Oops! analytics not found.",
+                    "payload": []
                 });
             }
         });

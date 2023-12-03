@@ -407,12 +407,15 @@ TopicController.post('/analytics',
   });
 
 // Get user analytics by id 
-TopicController.get('/user-analytics/:user_id', async (request: Request, response: Response, next: NextFunction) => {
+TopicController.put('/user-analytics/:user_id', async (request: Request, response: Response, next: NextFunction) => {
   try {
+
+    const { limit = 5, page = 1, type, search } = request.body;
+    const count = await TopicModel.count();
     const { user_id } = request.params;
     var ObjectId = require('mongodb').ObjectId;
 
-    console.log("user_id>>>>>>>>>",user_id)
+    console.log("user_id>>>>>>>>>", user_id)
 
     await UserAnalyticsModel.aggregate([
       {
@@ -427,12 +430,15 @@ TopicController.get('/user-analytics/:user_id', async (request: Request, respons
         },
       }
     ])
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit * 1)
       .then((val) => {
         if (val) {
           response.status(200).send({
             "status": "SUCCESS",
-            "msg": "Analytics details successfully get",
-            "payload": val.map((value)=>{
+            "msg": "Analytics details successfully",
+            "payload": val.map((value) => {
               return {
                 "_id": value._id,
                 "topic_id": value.topic_id,
@@ -444,17 +450,20 @@ TopicController.get('/user-analytics/:user_id', async (request: Request, respons
                 "rightAnswerCount": value.rightAnswerCount,
                 "status": value.status,
                 "point": value.point,
+                "createdAt": value.createdAt
               }
-            })
+            }),
+            "totalPages": Math.ceil(count / limit),
+            "currentPage": page
           });
         } else {
-          response.status(200).send({
+          response.status(404).send({
             "status": "ERROR",
-            "msg": "Oops! analytics not found."
+            "msg": "Oops! analytics not found.",
+            "payload": []
           });
         }
       })
-
   } catch (error) {
     next(error)
   }

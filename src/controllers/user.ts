@@ -315,7 +315,6 @@ UserController.post(
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      // return response.status(400).json({ errors: errors.array() });
       return response.status(200).send({
         "errors": errors.array()
       });
@@ -325,10 +324,21 @@ UserController.post(
         const data = await UserModel.findOne({ email: body.email });
         if (data) {
           console.log("if data")
-          bcrypt.compare(body.password, data['password'], function (err, result) {
+          bcrypt.compare(body.password, data['password'], async function (err, result) {
             // if (err) throw err;
             if (result) {
               console.log("if bcrypt")
+
+              await UserModel.updateOne({ email: body.email },
+                { updatedAt: new Date, lastlogindate: new Date },
+                { upsert: true, useFindAndModify: false },
+                function (err, result) {
+                  if (result) {
+                    console.log("updatedAt update>>>>",result)
+                  }else{
+                    console.log("updatedAt error>>>>",err)
+                  }
+                })
 
               const payload = {
                 id: data._id,

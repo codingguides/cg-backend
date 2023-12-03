@@ -289,7 +289,6 @@ exports.UserController.put('/reset-password/:id', async (request, response, next
 exports.UserController.post('/login', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 5 characters long!").isLength({ min: 5 }), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
-        // return response.status(400).json({ errors: errors.array() });
         return response.status(200).send({
             "errors": errors.array()
         });
@@ -300,10 +299,18 @@ exports.UserController.post('/login', (0, express_validator_1.body)('email', "In
             const data = await models_1.UserModel.findOne({ email: body.email });
             if (data) {
                 console.log("if data");
-                bcrypt.compare(body.password, data['password'], function (err, result) {
+                bcrypt.compare(body.password, data['password'], async function (err, result) {
                     // if (err) throw err;
                     if (result) {
                         console.log("if bcrypt");
+                        await models_1.UserModel.updateOne({ email: body.email }, { updatedAt: new Date, lastlogindate: new Date }, { upsert: true, useFindAndModify: false }, function (err, result) {
+                            if (result) {
+                                console.log("updatedAt update>>>>", result);
+                            }
+                            else {
+                                console.log("updatedAt error>>>>", err);
+                            }
+                        });
                         const payload = {
                             id: data._id,
                             name: data['name'],

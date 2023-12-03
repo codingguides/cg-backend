@@ -25,6 +25,18 @@ const UserSchema = new mongoose_1.Schema({
     lastlogindate: {
         type: String
     },
+    organization: {
+        type: String
+    },
+    birthday: {
+        type: String
+    },
+    location: {
+        type: String
+    },
+    profile_pic: {
+        type: String
+    },
 }, { timestamps: true });
 exports.UserModel = (0, mongoose_1.model)("users", UserSchema);
 //# sourceMappingURL=user.js.map
