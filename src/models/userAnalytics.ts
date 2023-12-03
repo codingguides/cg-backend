@@ -19,7 +19,7 @@ const UserAnalyticsSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["pass", "failed", "not completed"],
+        enum: ["Pass", "Fail", "not completed"],
     },
     point: {
         type: Number
