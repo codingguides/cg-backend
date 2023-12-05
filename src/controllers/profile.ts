@@ -1,5 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { UserModel } from "../models";
+var jwt = require('jsonwebtoken');
+let key = "KSpYChPbbKRrEIOj685rmY5d7eICGS5t";
 
 export const ProfileController = Router();
 
@@ -22,12 +24,29 @@ ProfileController.put('/update/:id', async (request: Request, response: Response
       query,
       body,
       { upsert: true, useFindAndModify: false },
-      function (err, result) {
+      async function (err, result) {
         if (result) {
-          response.status(200).send({
-            "status": "SUCCESS",
-            "msg": "Profile Succefully Updated"
-          });
+          await UserModel.findOne(query).then((data) => {
+            if (data) {
+              const payload = {
+                id: data._id,
+                name: data['name'],
+                email: data['email'],
+                phone: data['phone'],
+                type: data['type']
+              };
+              const accessToken = jwt.sign(payload, key, {
+                expiresIn: '30d'
+              });
+
+              response.status(200).send({
+                "status": "SUCCESS",
+                "msg": "Profile Succefully Updated",
+                "payload": data,
+                "token": accessToken
+              });
+            }
+          })
         } else {
           response.status(404).send({
             "status": "ERROR",
@@ -58,13 +77,12 @@ ProfileController.get('/get/:id', async (request: Request, response: Response, n
 
     const query = { _id: ObjectId(_id) };
 
-    await UserModel.findOne(query).then((val) => {
-      if (val) {
+    await UserModel.findOne(query).then((data) => {
+      if (data) {
         response.status(200).send({
           "status": "SUCCESS",
           "msg": "Profile details successfully",
-          "payload": val
-
+          "payload": data
         });
       } else {
         response.status(404).send({
