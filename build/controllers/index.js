@@ -13,6 +13,7 @@ const blog_1 = require("./blog");
 const newsletter_1 = require("./newsletter");
 const quizAnalytics_1 = require("./quizAnalytics");
 const page_1 = require("./forntend/page");
+const xlsx_1 = require("./forntend/xlsx");
 exports.RootController = (0, express_1.Router)();
 console.log("<=============controller=============>");
 exports.RootController.use("/user", user_1.UserController);
@@ -25,4 +26,5 @@ exports.RootController.use("/blog", guards_1.Authguard, blog_1.BlogController);
 exports.RootController.use("/newsletter", guards_1.Authguard, newsletter_1.NewsletterController);
 exports.RootController.use("/quiz-analytics", guards_1.Authguard, quizAnalytics_1.QuizAnalyticsController);
 exports.RootController.use("/page", page_1.FrontendController);
+exports.RootController.use("/xlsx", xlsx_1.XlsxController);
 //# sourceMappingURL=index.js.map

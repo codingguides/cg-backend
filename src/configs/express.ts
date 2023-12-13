@@ -24,7 +24,6 @@ export class Application {
             console.log("=========test==========")
             res.send({"status":"Running","project":"codingguides","port":EnvConfig.server.port})
         })
-
         console.log("==============express=================",EnvConfig.server.port)
 
         if (EnvConfig.server.environment != "PROD") {

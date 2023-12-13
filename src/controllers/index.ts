@@ -12,6 +12,7 @@ import { QuizAnalyticsController } from "./quizAnalytics";
 
 
 import { FrontendController } from "./forntend/page";
+import { XlsxController } from "./forntend/xlsx";
 
 
 export const RootController = Router()
@@ -28,3 +29,4 @@ RootController.use("/newsletter", Authguard, NewsletterController);
 RootController.use("/quiz-analytics", Authguard, QuizAnalyticsController);
 
 RootController.use("/page", FrontendController);
+RootController.use("/xlsx", XlsxController);

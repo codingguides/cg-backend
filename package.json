@@ -11,7 +11,7 @@
     "dev": "tsc && nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts",
     "pm2": "tsc && pm2 start main.js"
   },
-  "author": "Swarnabha paul",
+  "author": "Swarnabha paul & Suman Naskar",
   "keywords": [
     "example",
     "heroku"
@@ -52,6 +52,7 @@
     "path": "^0.12.7",
     "pm2": "^4.5.6",
     "public-ip": "^4.0.3",
+    "read-excel-file": "^5.7.1",
     "s3-blob-store": "^4.1.1",
     "soap": "^0.35.0",
     "store": "^2.0.12",
