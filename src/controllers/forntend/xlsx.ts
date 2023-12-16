@@ -13,7 +13,7 @@ export const XlsxController = Router();
 // Set up storage for uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'C:/Development/codebase/cg-backend/src/controllers/forntend/uploads');
+    cb(null, __dirname);
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -27,7 +27,6 @@ XlsxController.post('/upload', upload.single("uploadfile"), async (request: Requ
   try {
     let path = request.file.path;
     const { user_id,topic_id } = request.body;
-
     var workbook = XLSX.readFile(path);
     var sheet_name_list = workbook.SheetNames;
     let jsonData = XLSX.utils.sheet_to_json(
