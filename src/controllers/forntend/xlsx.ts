@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { QuestionModel } from "../../models";
+import { QuestionModel, RelationModel } from "../../models";
 import multer from "multer";
 var XLSX = require("xlsx");
 
@@ -26,7 +26,7 @@ const upload = multer({ storage: storage });
 XlsxController.post('/upload', upload.single("uploadfile"), async (request: Request, response: Response, next: NextFunction) => {
   try {
     let path = request.file.path;
-    const { user_id } = request.body;
+    const { user_id,topic_id } = request.body;
 
     var workbook = XLSX.readFile(path);
     var sheet_name_list = workbook.SheetNames;
@@ -41,8 +41,8 @@ XlsxController.post('/upload', upload.single("uploadfile"), async (request: Requ
     }
     // let savedData = await Lead.create(jsonData);
     const newData = []
-    const newMap = jsonData.map((singleData)=>{
-      newData.push(new QuestionModel({ 
+    jsonData.map((singleData)=>{
+      newData.push(new QuestionModel({
         "options": [singleData.option1, singleData.option2 , singleData.option3, singleData.option4],
         "question": singleData.question,
         "rightoption": singleData.rightoption,
@@ -54,12 +54,23 @@ XlsxController.post('/upload', upload.single("uploadfile"), async (request: Requ
       }))
     })
 
-    QuestionModel.insertMany(newData).then((docs) => {
-      return response.status(201).json({
-        success: true,
-        data: docs,
-        message: " rows added to the database",
-      });
+    QuestionModel.insertMany(newData).then(async(docs:any) => {
+      const newRelationArray = []
+      docs.map(async (singleDoc)=>{
+        newRelationArray.push(new RelationModel({
+          topic_id: topic_id,
+          question_id: singleDoc._id,
+          type: "topic"
+        }))
+      })
+      await RelationModel.insertMany(newRelationArray).then((relation:any) => {
+        return response.status(201).json({
+          success: true,
+          questiondata: docs,
+          relationdata: relation,
+          message: " rows added to the database",
+        });
+      })     
     }).catch((err) => {
       return response.status(500).json({ success: false, message: err.message });
     })
