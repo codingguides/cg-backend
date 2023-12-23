@@ -24,7 +24,7 @@ class Application {
         this.app.use((0, morgan_1.default)("combined"));
         this.app.set("trust proxy", true);
         this.app.use("/api", controllers_1.RootController);
-        this.app.get('/test', (req, res) => {
+        this.app.get('/', (req, res) => {
             console.log("=========test==========");
             res.send({ "status": "Running", "project": "codingguides", "port": environment_1.EnvConfig.server.port });
         });
