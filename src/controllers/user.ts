@@ -8,7 +8,6 @@ dotenv.config();
 var jwt = require('jsonwebtoken');
 let key = "KSpYChPbbKRrEIOj685rmY5d7eICGS5t";
 let tokenType = "Bearer";
-// let xlsxj = require("xlsx-to-json");
 
 import { check, body, validationResult } from 'express-validator';
 
@@ -24,13 +23,14 @@ export const UserController = Router();
 UserController.post(
   '/signup',
   body('email', "Invalid Email!").isEmail(),
-  body('password', "Password must be at least 5 characters long!").isLength({ min: 5 }),
-
+  body('password', "Password must be at least 8 characters long!").isLength({ min: 8 }),
+  check("name").not().isEmpty().withMessage("Name is required"),
+  check("phone").not().isEmpty().withMessage("Phone is required"),
+  
   async (request: Request, response: Response, next: NextFunction) => {
 
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-      // return response.status(400).json({ errors: errors.array() });
       return response.status(200).send({
         result: 'error',
         "errors": errors.array()
@@ -38,7 +38,6 @@ UserController.post(
     } else {
       try {
         const { body } = request;
-        console.log("body>>>>>>>>>>>>>>>>>>>>>>>", body)
         await UserModel.syncIndexes();
         const data = await UserModel.find({
           $or: [
@@ -103,8 +102,8 @@ UserController.post('/forgot-password', async (request: Request, response: Respo
       const transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
-          user: process.env.EMAIL,
-          pass: process.env.PASS
+          user: 'codingguidesproduction@gmail.com',
+          pass: 'Angrybirds@2023'
         }
       });
 
@@ -360,7 +359,6 @@ UserController.post(
               });
 
             } else {
-              console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<else>>>>>>>>>>>>>>>>>>")
               response.status(200).send({
                 "errors": [
                   {

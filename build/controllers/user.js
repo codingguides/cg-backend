@@ -14,17 +14,15 @@ dotenv_1.default.config();
 var jwt = require('jsonwebtoken');
 let key = "KSpYChPbbKRrEIOj685rmY5d7eICGS5t";
 let tokenType = "Bearer";
-// let xlsxj = require("xlsx-to-json");
 const express_validator_1 = require("express-validator");
 exports.UserController = (0, express_1.Router)();
 /*
 ** API NAME: User signup
 ** Methode: POST
 */
-exports.UserController.post('/signup', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 5 characters long!").isLength({ min: 5 }), async (request, response, next) => {
+exports.UserController.post('/signup', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 8 characters long!").isLength({ min: 8 }), (0, express_validator_1.check)("name").not().isEmpty().withMessage("Name is required"), (0, express_validator_1.check)("phone").not().isEmpty().withMessage("Phone is required"), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
-        // return response.status(400).json({ errors: errors.array() });
         return response.status(200).send({
             result: 'error',
             "errors": errors.array()
@@ -33,7 +31,6 @@ exports.UserController.post('/signup', (0, express_validator_1.body)('email', "I
     else {
         try {
             const { body } = request;
-            console.log("body>>>>>>>>>>>>>>>>>>>>>>>", body);
             await models_1.UserModel.syncIndexes();
             const data = await models_1.UserModel.find({
                 $or: [
@@ -94,8 +91,8 @@ exports.UserController.post('/forgot-password', async (request, response, next) 
             const transporter = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.PASS
+                    user: 'codingguidesproduction@gmail.com',
+                    pass: 'Angrybirds@2023'
                 }
             });
             const mailData = {
@@ -330,7 +327,6 @@ exports.UserController.post('/login', (0, express_validator_1.body)('email', "In
                         });
                     }
                     else {
-                        console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<else>>>>>>>>>>>>>>>>>>");
                         response.status(200).send({
                             "errors": [
                                 {
