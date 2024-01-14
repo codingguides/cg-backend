@@ -9,8 +9,7 @@ let key = "KSpYChPbbKRrEIOj685rmY5d7eICGS5t";
 let tokenType = "Bearer";
 const sgMail = require('@sendgrid/mail')
 import { check, body, validationResult } from 'express-validator';
-const nodemailer = require("nodemailer");
-const { google } = require("googleapis");
+import { senTMail } from '../common';
 
 export const UserController = Router();
 
@@ -26,7 +25,7 @@ UserController.post(
   body('password', "Password must be at least 8 characters long!").isLength({ min: 8 }),
   check("name").not().isEmpty().withMessage("Name is required"),
   check("phone").not().isEmpty().withMessage("Phone is required"),
-  
+
   async (request: Request, response: Response, next: NextFunction) => {
 
     const errors = validationResult(request);
@@ -83,7 +82,7 @@ UserController.post(
       }
     }
 
-});
+  });
 
 /*
 ** API NAME: User forgot password by id
@@ -99,39 +98,13 @@ UserController.post('/forgot-password', async (request: Request, response: Respo
       var month = mydate.getMonth();
       var date = mydate.getDate()
       var min = mydate.getMinutes()
-      
-      var obj = {day: date, month: month, min: min, id: data._id };
+
+      var obj = { day: date, month: month, min: min, id: data._id };
       var encoded = btoa(JSON.stringify(obj))
       let link = `${process.env.URL}/reset-password/${encoded}`;
 
-      const OAuth2 = google.auth.OAuth2;
-
-      const oauth2Client = new OAuth2(
-        process.env.CLIENTID,
-        process.env.CLIENTSECRET,
-        "https://developers.google.com/oauthplayground"
-      );
-
-      oauth2Client.setCredentials({
-        refresh_token: process.env.REFRESHTOKEN,
-      });
-
-      const accessToken = oauth2Client.getAccessToken();
-
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          type: "OAuth2",
-          user: "info.codingguides@gmail.com",
-          clientId: process.env.CLIENTID,
-          clientSecret: process.env.CLIENTSECRET,
-          refreshToken: process.env.REFRESHTOKEN,
-          accessToken: accessToken,
-        },
-      });
-      
       const mailOptions = {
-        from: "info.codingguides@gmail.com",
+        from: process.env.EMAIL,
         to: body.email,
         subject: "Forgot Password",
         text: "This is a test email sent using Nodemailer and Gmail.",
@@ -257,20 +230,22 @@ UserController.post('/forgot-password', async (request: Request, response: Respo
           </center>
           </body>`,
       };
-      
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          response.status(404).send({
-            "success": false,
-            "message": `Error: ${error}`
-          });
-        }else{
-          response.status(200).send({
-            "success": true,
-            "message": `Email sent: ${info.response}`
-          });
-        }
-      });
+
+      await senTMail(mailOptions).then((res) => {
+        console.log("res>>>>>>>1>>>>>>>>", res);
+        response.status(200).send({
+          "success": true,
+          "message": "Email sent successfully.",
+          "data": res
+        });
+      }).catch((error) => {
+        console.log("error>>>>>1>>>>>>>>>>", error);
+        response.status(404).send({
+          "success": false,
+          "message": "Oops! Mail not send. ",
+          "error": error
+        });
+      })
 
     } else {
       response.status(404).send({
@@ -357,9 +332,9 @@ UserController.post(
                 { upsert: true, useFindAndModify: false },
                 function (err, result) {
                   if (result) {
-                    console.log("updatedAt update>>>>",result)
-                  }else{
-                    console.log("updatedAt error>>>>",err)
+                    console.log("updatedAt update>>>>", result)
+                  } else {
+                    console.log("updatedAt error>>>>", err)
                   }
                 })
 
@@ -407,4 +382,4 @@ UserController.post(
         next(error)
       }
     }
-});
+  });
