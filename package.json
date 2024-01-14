@@ -20,6 +20,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.405.0",
     "@google-analytics/data": "^2.4.2",
+    "@sendgrid/mail": "^8.1.0",
     "@types/lodash": "^4.14.164",
     "@types/multer": "^1.4.4",
     "@types/multer-s3": "^2.7.8",

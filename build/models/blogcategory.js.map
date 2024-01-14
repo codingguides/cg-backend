@@ -1,0 +1,1 @@
+{"version":3,"file":"blogcategory.js","sourceRoot":"","sources":["../../src/models/blogcategory.ts"],"names":[],"mappings":";;;AAAA,uCAAyC;AACzC,MAAM,kBAAkB,GAAG,IAAI,iBAAM,CAAC;IAClC,QAAQ,EAAE;QACN,IAAI,EAAE,MAAM;KACf;IACD,YAAY,EAAE;QACV,IAAI,EAAE,MAAM;KACf;CACJ,EAAE,EAAE,UAAU,EAAE,IAAI,EAAE,CAAC,CAAC;AAEZ,QAAA,iBAAiB,GAAG,IAAA,gBAAK,EAAC,cAAc,EAAE,kBAAkB,CAAC,CAAC"}
