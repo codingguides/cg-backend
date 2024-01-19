@@ -384,39 +384,55 @@ UserController.post('/forgot-password', async (request: Request, response: Respo
 ** Methode: PUT
 */
 
-UserController.put('/reset-password/:id', async (request: Request, response: Response, next: NextFunction) => {
+
+UserController.put("/reset-password/:id",
+async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { body } = request;
     const { id } = request.params;
-    var ObjectId = require('mongodb').ObjectId;
+    var ObjectId = require("mongodb").ObjectId;
     var _id = new ObjectId(id);
 
     const query = { _id: ObjectId(_id) };
-    let newpass = await hashPassword(body.password)
 
-    await UserModel.updateOne(
-      query,
-      {
-        password: newpass,
-      },
-      { upsert: true, useFindAndModify: false },
-      function (err, result) {
-        if (err) {
-          response.status(404).send({
-            "error": true,
-            "data": err
-          });
-        } else {
-          response.status(200).send({
-            "success": true,
-            "message": result.nModified == 1 ? "Password Succefully Updated" : "Something Wrong Please Try Again"
-          });
+    const data = await UserModel.findOne(query);
+    if (data) {
+      bcrypt.compare(
+        body.oldpassword,
+        data["password"],
+        async function (error, result) {
+          if (result) {
+            await UserModel.updateOne(
+              query,
+              { password: await hashPassword(body.newpassword) },
+              { upsert: true, useFindAndModify: false },
+              async function (err, result) {
+                if (result) {
+                  response.status(200).send({
+                    status: "SUCCESS",
+                    msg: "Profile Password Updated Successfully",
+                  });
+                } else {
+                  response.status(404).send({
+                    status: "ERROR",
+                    msg: "Oops! Something wrong.",
+                    err,
+                  });
+                }
+              }
+            );
+          } else {
+            response.status(404).send({
+              status: "ERROR",
+              msg: "Oops! Current password not match.",
+              error,
+            });
+          }
         }
-      }
-    );
-
+      );
+    }
   } catch (error) {
-    next(error)
+    next(error);
   }
 });
 
@@ -502,4 +518,4 @@ UserController.post(
         next(error)
       }
     }
-  });
+});

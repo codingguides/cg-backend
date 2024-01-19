@@ -9,13 +9,10 @@ import { RelationController } from "./relation";
 import { BlogController } from "./blog";
 import { NewsletterController } from "./newsletter";
 import { QuizAnalyticsController } from "./quizAnalytics";
-
-
 import { FrontendController } from "./forntend/page";
 import { XlsxController } from "./forntend/xlsx";
 
-
-export const RootController = Router()
+export const RootController = Router();
 console.log("<=============controller=============>")
 RootController.use("/user", UserController);
 RootController.use("/profile", Authguard, ProfileController);

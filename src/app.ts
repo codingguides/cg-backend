@@ -9,8 +9,7 @@ function bootstrap() {
 
   const app = Application.init();
   const { port } = EnvConfig.server;
-  swagger(app)
-
+  swagger(app);
   app.listen(port || 8080, () => {
     console.info(`server started on --------------------------> ${port}`);
   });
