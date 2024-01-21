@@ -393,14 +393,14 @@ exports.UserController.put("/reset-password/:id", async (request, response, next
                 response.status(404).send({
                     error: true,
                     data: err,
+                    message: "Something Wrong Please Try Again",
                 });
             }
             else {
                 response.status(200).send({
                     success: true,
-                    message: result.nModified == 1
-                        ? "Password Succefully Updated"
-                        : "Something Wrong Please Try Again",
+                    message: "Password Succefully Updated",
+                    data: result,
                 });
             }
         });
