@@ -6,29 +6,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const express_1 = require("express");
 const models_1 = require("../models");
-const { hashPassword } = require("../services/hash");
-const bcrypt = require("bcrypt");
+const { hashPassword } = require('../services/hash');
+const bcrypt = require('bcrypt');
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-var jwt = require("jsonwebtoken");
+var jwt = require('jsonwebtoken');
 let key = "KSpYChPbbKRrEIOj685rmY5d7eICGS5t";
 let tokenType = "Bearer";
-const sgMail = require("@sendgrid/mail");
+const sgMail = require('@sendgrid/mail');
 const express_validator_1 = require("express-validator");
 const common_1 = require("../common");
 exports.UserController = (0, express_1.Router)();
 /*
- ** API NAME: User signup
- ** Methode: POST
- */
-exports.UserController.post("/signup", (0, express_validator_1.body)("email", "Invalid Email!").isEmail(), (0, express_validator_1.body)("password", "Password must be at least 8 characters long!").isLength({
-    min: 8,
-}), (0, express_validator_1.check)("name").not().isEmpty().withMessage("Name is required"), (0, express_validator_1.check)("phone").not().isEmpty().withMessage("Phone is required"), async (request, response, next) => {
+** API NAME: User signup
+** Methode: POST
+*/
+exports.UserController.post('/signup', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 8 characters long!").isLength({ min: 8 }), (0, express_validator_1.check)("name").not().isEmpty().withMessage("Name is required"), (0, express_validator_1.check)("phone").not().isEmpty().withMessage("Phone is required"), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
         return response.status(200).send({
-            result: "error",
-            errors: errors.array(),
+            result: 'error',
+            "errors": errors.array()
         });
     }
     else {
@@ -36,17 +34,20 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
             const { body } = request;
             await models_1.UserModel.syncIndexes();
             const data = await models_1.UserModel.find({
-                $or: [{ email: body.email }, { phone: body.phone }],
+                $or: [
+                    { "email": body.email },
+                    { "phone": body.phone }
+                ]
             });
             if (data.length > 0) {
                 response.status(200).send({
-                    result: "error",
-                    errors: [
+                    result: 'error',
+                    "errors": [
                         {
-                            success: false,
-                            msg: "An Account already exists with this email or phone number.",
-                        },
-                    ],
+                            "success": false,
+                            "msg": "An Account already exists with this email or phone number."
+                        }
+                    ]
                 });
             }
             else {
@@ -57,7 +58,7 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
                     password: await hashPassword(body.password),
                     type: body.type,
                     isdelete: 0,
-                    lastlogindate: new Date(),
+                    lastlogindate: new Date()
                 });
                 userData.save(async (err, data) => {
                     if (data) {
@@ -170,19 +171,17 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
                     </center>
                     </body>`,
                         };
-                        await (0, common_1.senTMail)(mailOptions)
-                            .then((res) => {
+                        await (0, common_1.senTMail)(mailOptions).then((res) => {
                             response.status(200).send({
-                                success: true,
-                                message: "Signup successfully.",
-                                data: userData,
+                                "success": true,
+                                "message": "Signup successfully.",
+                                "data": userData
                             });
-                        })
-                            .catch((error) => {
+                        }).catch((error) => {
                             response.status(404).send({
-                                success: false,
-                                message: "Oops! Mail not send. ",
-                                error: error,
+                                "success": false,
+                                "message": "Oops! Mail not send. ",
+                                "error": error
                             });
                         });
                     }
@@ -198,29 +197,19 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
     }
 });
 /*
- ** API NAME: User forgot password by id
- ** Methode: POST
- */
-exports.UserController.post("/forgot-password", async (request, response, next) => {
+** API NAME: User forgot password by id
+** Methode: POST
+*/
+exports.UserController.post('/forgot-password', async (request, response, next) => {
     try {
         const { body } = request;
         const data = await models_1.UserModel.findOne({ email: body.email });
         if (data) {
-            let mydate = new Date();
-            let month = mydate.getMonth();
-            let date = mydate.getDate();
-            let min = mydate.getMinutes();
-            let hour = mydate.getHours() * 60;
-            let timestamp = hour + min;
-            console.log("hour>>>>>", hour);
-            console.log("GET hour>>>>>", mydate.getHours());
-            console.log("timestamp>>>>>", timestamp);
-            let obj = {
-                day: date,
-                month: month,
-                timestamp: timestamp,
-                id: data._id,
-            };
+            var mydate = new Date();
+            var month = mydate.getMonth();
+            var date = mydate.getDate();
+            var min = mydate.getMinutes();
+            var obj = { day: date, month: month, min: min, id: data._id };
             var encoded = btoa(JSON.stringify(obj));
             let link = `${process.env.URL}/reset-password/${encoded}`;
             const mailOptions = {
@@ -350,26 +339,24 @@ exports.UserController.post("/forgot-password", async (request, response, next) 
           </center>
           </body>`,
             };
-            await (0, common_1.senTMail)(mailOptions)
-                .then((res) => {
+            await (0, common_1.senTMail)(mailOptions).then((res) => {
                 response.status(200).send({
-                    success: true,
-                    message: "Email sent successfully.",
-                    data: res,
+                    "success": true,
+                    "message": "Email sent successfully.",
+                    "data": res
                 });
-            })
-                .catch((error) => {
+            }).catch((error) => {
                 response.status(404).send({
-                    success: false,
-                    message: "Oops! Mail not send. ",
-                    error: error,
+                    "success": false,
+                    "message": "Oops! Mail not send. ",
+                    "error": error
                 });
             });
         }
         else {
             response.status(404).send({
-                success: false,
-                message: "Oops! email not found.",
+                "success": false,
+                "message": "Oops! email not found."
             });
         }
     }
@@ -378,9 +365,9 @@ exports.UserController.post("/forgot-password", async (request, response, next) 
     }
 });
 /*
- ** API NAME: User reset password by id
- ** Methode: PUT
- */
+** API NAME: User reset password by id
+** Methode: PUT
+*/
 exports.UserController.put("/reset-password/:id", async (request, response, next) => {
     try {
         const { body } = request;
@@ -388,41 +375,49 @@ exports.UserController.put("/reset-password/:id", async (request, response, next
         var ObjectId = require("mongodb").ObjectId;
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
-        let newpass = await hashPassword(body.password);
-        await models_1.UserModel.updateOne(query, {
-            password: newpass,
-        }, { upsert: true, useFindAndModify: false }, function (err, result) {
-            if (err) {
-                response.status(404).send({
-                    error: true,
-                    data: err,
-                    message: "Something Wrong Please Try Again",
-                });
-            }
-            else {
-                response.status(200).send({
-                    success: true,
-                    message: "Password Succefully Updated.",
-                    data: result,
-                });
-            }
-        });
+        const data = await models_1.UserModel.findOne(query);
+        if (data) {
+            bcrypt.compare(body.oldpassword, data["password"], async function (error, result) {
+                if (result) {
+                    await models_1.UserModel.updateOne(query, { password: await hashPassword(body.newpassword) }, { upsert: true, useFindAndModify: false }, async function (err, result) {
+                        if (result) {
+                            response.status(200).send({
+                                status: "SUCCESS",
+                                msg: "Profile Password Updated Successfully",
+                            });
+                        }
+                        else {
+                            response.status(404).send({
+                                status: "ERROR",
+                                msg: "Oops! Something wrong.",
+                                err,
+                            });
+                        }
+                    });
+                }
+                else {
+                    response.status(404).send({
+                        status: "ERROR",
+                        msg: "Oops! Current password not match.",
+                        error,
+                    });
+                }
+            });
+        }
     }
     catch (error) {
         next(error);
     }
 });
 /*
- ** API NAME: User login
- ** Methode: POST
- */
-exports.UserController.post("/login", (0, express_validator_1.body)("email", "Invalid Email!").isEmail(), (0, express_validator_1.body)("password", "Password must be at least 5 characters long!").isLength({
-    min: 5,
-}), async (request, response, next) => {
+** API NAME: User login
+** Methode: POST
+*/
+exports.UserController.post('/login', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), (0, express_validator_1.body)('password', "Password must be at least 5 characters long!").isLength({ min: 5 }), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
         return response.status(200).send({
-            errors: errors.array(),
+            "errors": errors.array()
         });
     }
     else {
@@ -431,11 +426,11 @@ exports.UserController.post("/login", (0, express_validator_1.body)("email", "In
             const data = await models_1.UserModel.findOne({ email: body.email });
             if (data) {
                 console.log("if data");
-                bcrypt.compare(body.password, data["password"], async function (err, result) {
+                bcrypt.compare(body.password, data['password'], async function (err, result) {
                     // if (err) throw err;
                     if (result) {
                         console.log("if bcrypt");
-                        await models_1.UserModel.updateOne({ email: body.email }, { updatedAt: new Date(), lastlogindate: new Date() }, { upsert: true, useFindAndModify: false }, function (err, result) {
+                        await models_1.UserModel.updateOne({ email: body.email }, { updatedAt: new Date, lastlogindate: new Date }, { upsert: true, useFindAndModify: false }, function (err, result) {
                             if (result) {
                                 console.log("updatedAt update>>>>", result);
                             }
@@ -445,42 +440,42 @@ exports.UserController.post("/login", (0, express_validator_1.body)("email", "In
                         });
                         const payload = {
                             id: data._id,
-                            name: data["name"],
-                            email: data["email"],
-                            phone: data["phone"],
-                            type: data["type"],
+                            name: data['name'],
+                            email: data['email'],
+                            phone: data['phone'],
+                            type: data['type']
                         };
                         const accessToken = jwt.sign(payload, key, {
-                            expiresIn: "30d",
+                            expiresIn: '30d'
                         });
                         response.status(200).send({
-                            result: "ok",
+                            result: 'ok',
                             data: {
                                 payload,
-                                token: accessToken,
-                            },
+                                token: accessToken
+                            }
                         });
                     }
                     else {
                         response.status(200).send({
-                            errors: [
+                            "errors": [
                                 {
-                                    msg: "Oops! Password not matched",
-                                    param: "password",
-                                },
-                            ],
+                                    "msg": "Oops! Password not matched",
+                                    "param": "password"
+                                }
+                            ]
                         });
                     }
                 });
             }
             else {
                 response.status(200).send({
-                    errors: [
+                    "errors": [
                         {
-                            msg: "Oops! Email not found",
-                            param: "email",
-                        },
-                    ],
+                            "msg": "Oops! Email not found",
+                            "param": "email"
+                        }
+                    ]
                 });
             }
         }
