@@ -213,6 +213,7 @@ UserController.post(
       const data = await UserModel.findOne({ email: body.email });
       if (data) {
         let mydate = new Date();
+        let year = mydate.getFullYear();
         let month = mydate.getMonth();
         let date = mydate.getDate();
         let min = mydate.getMinutes();
@@ -222,6 +223,7 @@ UserController.post(
         let obj = {
           day: date,
           month: month,
+          year: year,
           timestamp: timestamp,
           id: data._id,
         };
