@@ -474,19 +474,13 @@ FrontendController.get('/blog/:slug', async (request: Request, response: Respons
           },
           { $sort: { category: 1 } }
         ]).then(async (res) => {
-
-          const categoryMap = {};
-          res.forEach(category => {
-            categoryMap[category.sub_category] = category;
-          });
-
           if (res) {
             response.status(200).send({
               "status": "SUCCESS",
               "msg": "Blog details successfully",
               "payload": {
                 "topic": val,
-                "relation": categoryMap
+                "res": res
               }
             });
           } else {
