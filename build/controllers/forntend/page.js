@@ -438,15 +438,15 @@ exports.FrontendController.get('/blog', async (request, response, next) => {
         next(error);
     }
 });
-// For forntend example details page
-exports.FrontendController.get('/blog/:slug', async (request, response, next) => {
+// For forntend example details page by category
+exports.FrontendController.get('/blog/:category', async (request, response, next) => {
     try {
-        const { slug } = request.params;
-        await models_1.TopicModel.findOne({ "slug": slug }).then(async (val) => {
+        const { category } = request.params;
+        await models_1.TopicModel.findOne({ "slug": category }).then(async (val) => {
             if (val) {
                 await models_1.BlogCategoryModel.syncIndexes();
                 await models_1.BlogCategoryModel.aggregate([
-                    { $match: { 'category': { '$regex': slug } } },
+                    { $match: { 'category': { '$regex': category } } },
                     {
                         $lookup: {
                             from: "blogs",
@@ -473,6 +473,30 @@ exports.FrontendController.get('/blog/:slug', async (request, response, next) =>
                             "msg": "Oops! Relation not found."
                         });
                     }
+                });
+            }
+            else {
+                response.status(200).send({
+                    "status": "ERROR",
+                    "msg": "Oops! blog not found."
+                });
+            }
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+// For forntend example blog inner page
+exports.FrontendController.get('/blog/inner/:slug', async (request, response, next) => {
+    try {
+        const { slug } = request.params;
+        await models_1.TopicModel.findOne({ "slug": slug }).then(async (val) => {
+            if (val) {
+                response.status(200).send({
+                    "status": "SUCCESS",
+                    "msg": "Blog details successfully",
+                    "payload": val
                 });
             }
             else {

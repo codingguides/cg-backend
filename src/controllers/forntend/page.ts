@@ -454,16 +454,16 @@ FrontendController.get('/blog', async (request: Request, response: Response, nex
   }
 });
 
-// For forntend example details page
-FrontendController.get('/blog/:slug', async (request: Request, response: Response, next: NextFunction) => {
+// For forntend example details page by category
+FrontendController.get('/blog/:category', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const { slug } = request.params;
+    const { category } = request.params;
 
-    await TopicModel.findOne({ "slug": slug }).then(async (val) => {
+    await TopicModel.findOne({ "slug": category }).then(async (val) => {
       if (val) {
         await BlogCategoryModel.syncIndexes();
         await BlogCategoryModel.aggregate([
-          { $match: { 'category': { '$regex': slug } } },
+          { $match: { 'category': { '$regex': category } } },
           {
             $lookup: {
               from: "blogs",
@@ -493,6 +493,32 @@ FrontendController.get('/blog/:slug', async (request: Request, response: Respons
         })
 
 
+      } else {
+        response.status(200).send({
+          "status": "ERROR",
+          "msg": "Oops! blog not found."
+        });
+      }
+
+    })
+
+  } catch (error) {
+    next(error)
+  }
+});
+
+// For forntend example blog inner page
+FrontendController.get('/blog/inner/:slug', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { slug } = request.params;
+
+    await TopicModel.findOne({ "slug": slug }).then(async (val) => {
+      if (val) {
+        response.status(200).send({
+          "status": "SUCCESS",
+          "msg": "Blog details successfully",
+          "payload": val
+        });
       } else {
         response.status(200).send({
           "status": "ERROR",
