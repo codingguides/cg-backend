@@ -491,13 +491,17 @@ exports.FrontendController.get('/blog/:category', async (request, response, next
 exports.FrontendController.get('/blog/inner/:slug', async (request, response, next) => {
     try {
         const { slug } = request.params;
-        console.log("slug>>>>>>>", slug);
-        await models_1.TopicModel.findOne({ "slug": slug }).then(async (val) => {
+        var ObjectId = require("mongodb").ObjectId;
+        await models_1.BlogModel.findOne({ "slug": slug }).then(async (val) => {
             if (val) {
+                let relatedBlogList = await models_1.BlogModel.find({ "category_id": ObjectId(val.category_id) });
                 response.status(200).send({
                     "status": "SUCCESS",
                     "msg": "Blog details successfully",
-                    "payload": val
+                    "payload": {
+                        "blogDetails": val,
+                        "relatedBlogList": relatedBlogList
+                    }
                 });
             }
             else {
