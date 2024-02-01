@@ -6,6 +6,12 @@ const BlogSchema = new Schema({
     slug: {
         type: String
     },
+    sort_title: {
+        type: String,
+    },
+    sort_slug: {
+        type: String
+    },
     description: {
         type: String
     },

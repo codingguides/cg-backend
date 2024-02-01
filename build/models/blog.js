@@ -9,6 +9,12 @@ const BlogSchema = new mongoose_1.Schema({
     slug: {
         type: String
     },
+    sort_title: {
+        type: String,
+    },
+    sort_slug: {
+        type: String
+    },
     description: {
         type: String
     },

@@ -491,6 +491,7 @@ exports.FrontendController.get('/blog/:category', async (request, response, next
 exports.FrontendController.get('/blog/inner/:slug', async (request, response, next) => {
     try {
         const { slug } = request.params;
+        console.log("slug>>>>>>>", slug);
         await models_1.TopicModel.findOne({ "slug": slug }).then(async (val) => {
             if (val) {
                 response.status(200).send({

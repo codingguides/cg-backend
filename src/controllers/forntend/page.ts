@@ -511,7 +511,7 @@ FrontendController.get('/blog/:category', async (request: Request, response: Res
 FrontendController.get('/blog/inner/:slug', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { slug } = request.params;
-
+    console.log("slug>>>>>>>", slug)
     await TopicModel.findOne({ "slug": slug }).then(async (val) => {
       if (val) {
         response.status(200).send({

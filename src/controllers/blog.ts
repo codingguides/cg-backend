@@ -8,6 +8,8 @@ BlogController.post(
   "/add",
   check("title").not().isEmpty().withMessage("Title is required"),
   check("slug").not().isEmpty().withMessage("Slug is required"),
+  check("sort_title").not().isEmpty().withMessage("Sort Title is required"),
+  check("sort_slug").not().isEmpty().withMessage("Sort Slug is required"),
   check("description").not().isEmpty().withMessage("Description is required"),
   check("status").not().isEmpty().withMessage("Status is required"),
   check("user_id").not().isEmpty().withMessage("user_id is required"),
@@ -31,6 +33,8 @@ BlogController.post(
           let QuestionData = new BlogModel({
             title: body.title,
             slug: body.slug,
+            sort_title: body.sort_title,
+            sort_slug: body.sort_slug,
             description: body.description,
             feature_image: body.feature_image,
             status: body.status,
