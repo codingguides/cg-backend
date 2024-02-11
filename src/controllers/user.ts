@@ -193,7 +193,6 @@ UserController.post(
           });
         }
       } catch (error) {
-        console.log("error>>>>>>else>>>>>>>>>>>", error);
         next(error);
       }
     }
@@ -458,7 +457,7 @@ UserController.post(
             body.password,
             data["password"],
             async function (err, result) {
-              // if (err) throw err;
+              if (err) throw err;
               if (result) {
                 console.log("if bcrypt");
 
@@ -481,7 +480,9 @@ UserController.post(
                   email: data["email"],
                   phone: data["phone"],
                   type: data["type"],
+                  pstatus: data["password"] == "" ? false : true 
                 };
+                
                 const accessToken = jwt.sign(payload, key, {
                   expiresIn: "30d",
                 });
@@ -518,6 +519,29 @@ UserController.post(
       } catch (error) {
         next(error);
       }
+    }
+  }
+);
+
+
+UserController.post("/social-login" ,async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const { body } = request;
+      const data = await UserModel.findOne({ email: body.email });
+      if (data) {
+        console.log("if data");
+        response.status(200).send({
+          status: true,
+          nextcall: 'signin'
+        });
+      } else {
+        response.status(200).send({
+          status: true,
+          nextcall: 'signup'
+        });
+      }
+    } catch (error) {
+      next(error);
     }
   }
 );

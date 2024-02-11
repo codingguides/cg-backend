@@ -113,39 +113,61 @@ ProfileController.put(
 
       const data = await UserModel.findOne(query);
       if (data) {
-        bcrypt.compare(
-          body.oldpassword,
-          data["password"],
-          async function (error, result) {
-            if (result) {
-              await UserModel.updateOne(
-                query,
-                { password: await hashPassword(body.newpassword) },
-                { upsert: true, useFindAndModify: false },
-                async function (err, result) {
-                  if (result) {
-                    response.status(200).send({
-                      status: "SUCCESS",
-                      msg: "Profile Password Updated Successfully",
-                    });
-                  } else {
-                    response.status(404).send({
-                      status: "ERROR",
-                      msg: "Oops! Something wrong.",
-                      err,
-                    });
-                  }
-                }
-              );
-            } else {
-              response.status(404).send({
-                status: "ERROR",
-                msg: "Oops! Current password not match.",
-                error,
-              });
+        if(data["password"] == ""){
+          await UserModel.updateOne(
+            query,
+            { password: await hashPassword(body.newpassword) },
+            { upsert: true, useFindAndModify: false },
+            async function (err, result) {
+              if (result) {
+                response.status(200).send({
+                  status: "SUCCESS",
+                  msg: "Profile Password Updated Successfully",
+                });
+              } else {
+                response.status(200).send({
+                  status: "ERROR",
+                  msg: "Oops! Something wrong.",
+                  err,
+                });
+              }
             }
-          }
-        );
+          );
+        }else{
+          bcrypt.compare(
+            body.oldpassword,
+            data["password"],
+            async function (error, result) {
+              if (result) {
+                await UserModel.updateOne(
+                  query,
+                  { password: await hashPassword(body.newpassword) },
+                  { upsert: true, useFindAndModify: false },
+                  async function (err, result) {
+                    if (result) {
+                      response.status(200).send({
+                        status: "SUCCESS",
+                        msg: "Profile Password Updated Successfully",
+                      });
+                    } else {
+                      response.status(404).send({
+                        status: "ERROR",
+                        msg: "Oops! Something wrong.",
+                        err,
+                      });
+                    }
+                  }
+                );
+              } else {
+                response.status(200).send({
+                  status: "ERROR",
+                  msg: "Oops! Current password not match.",
+                  error,
+                });
+              }
+            }
+          );
+        }
       }
     } catch (error) {
       next(error);
