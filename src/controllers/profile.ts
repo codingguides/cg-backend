@@ -28,6 +28,8 @@ ProfileController.put(
         body,
         { upsert: true, useFindAndModify: false },
         async function (err, result) {
+          console.log("result>>>>>0",result)
+
           if (result) {
             await UserModel.findOne(query).then((data) => {
               if (data) {
@@ -114,7 +116,7 @@ ProfileController.put(
       const data = await UserModel.findOne(query);
       if (data) {
         if(data["password"] == ""){
-          await UserModel.updateOne(
+          const update = await UserModel.updateOne(
             query,
             { password: await hashPassword(body.newpassword) },
             { upsert: true, useFindAndModify: false },
@@ -133,6 +135,7 @@ ProfileController.put(
               }
             }
           );
+          console.log("update>>>>>>",update)
         }else{
           bcrypt.compare(
             body.oldpassword,

@@ -21,11 +21,12 @@ export const UserController = Router();
 UserController.post(
   "/signup",
   body("email", "Invalid Email!").isEmail(),
-  body("password", "Password must be at least 8 characters long!").isLength({
-    min: 8,
-  }),
+  // body("password", "Password must be at least 8 characters long!").isLength({
+  //   min: 8,
+  // }),
   check("name").not().isEmpty().withMessage("Name is required"),
   check("phone").not().isEmpty().withMessage("Phone is required"),
+  check("loginType").not().isEmpty().withMessage("loginType is required"),
 
   async (request: Request, response: Response, next: NextFunction) => {
     const errors = validationResult(request);
@@ -38,6 +39,19 @@ UserController.post(
       try {
         const { body } = request;
         await UserModel.syncIndexes();
+
+        if(body.loginType == "normal" && body.password == ""){
+          response.status(200).send({
+            result: "error",
+            errors: [
+              {
+                success: false,
+                msg: "Password must be at least 8 characters long!",
+              },
+            ],
+          });
+        }
+
         const data = await UserModel.find({
           $or: [{ email: body.email }, { phone: body.phone }],
         });
@@ -57,10 +71,11 @@ UserController.post(
             name: body.name,
             email: body.email,
             phone: body.phone,
-            password: await hashPassword(body.password),
+            password: body.pasword == "" ? "" : await hashPassword(body.password),
             type: body.type,
             isdelete: 0,
             lastlogindate: new Date(),
+            loginType: "normal"
           });
           userData.save(async (err, data) => {
             if (data) {
@@ -173,22 +188,26 @@ UserController.post(
                     </center>
                     </body>`,
               };
-
-              await senTMail(mailOptions)
-                .then((res) => {
-                  response.status(200).send({
-                    success: true,
-                    message: "Signup successfully.",
-                    data: userData,
-                  });
-                })
-                .catch((error) => {
-                  response.status(404).send({
-                    success: false,
-                    message: "Oops! Mail not send. ",
-                    error: error,
-                  });
-                });
+              response.status(200).send({
+                success: true,
+                message: "Signup successfully.",
+                data: userData,
+              });
+              // await senTMail(mailOptions)
+              //   .then((res) => {
+              //     response.status(200).send({
+              //       success: true,
+              //       message: "Signup successfully.",
+              //       data: userData,
+              //     });
+              //   })
+              //   .catch((error) => {
+              //     response.status(404).send({
+              //       success: false,
+              //       message: "Oops! Mail not send. ",
+              //       error: error,
+              //     });
+              //   });
             } else if (err) throw err;
           });
         }
@@ -438,9 +457,7 @@ UserController.put(
 UserController.post(
   "/login",
   body("email", "Invalid Email!").isEmail(),
-  body("password", "Password must be at least 5 characters long!").isLength({
-    min: 5,
-  }),
+  check("loginType").not().isEmpty().withMessage("loginType is required"),
   async (request: Request, response: Response, next: NextFunction) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
@@ -451,61 +468,83 @@ UserController.post(
       try {
         const { body } = request;
         const data = await UserModel.findOne({ email: body.email });
+        let status:boolean = false;
         if (data) {
-          console.log("if data");
-          bcrypt.compare(
-            body.password,
-            data["password"],
-            async function (err, result) {
-              if (err) throw err;
-              if (result) {
-                console.log("if bcrypt");
+          status = true;
+          if(body.loginType == "normal" && body.password == ""){
+            response.status(200).send({
+              result: "error",
+              errors: [
+                {
+                  success: false,
+                  msg: "Password must be at least 8 characters long!",
+                },
+              ],
+            });
+          }
 
-                await UserModel.updateOne(
-                  { email: body.email },
-                  { updatedAt: new Date(), lastlogindate: new Date() },
-                  { upsert: true, useFindAndModify: false },
-                  function (err, result) {
-                    if (result) {
-                      console.log("updatedAt update>>>>", result);
-                    } else {
-                      console.log("updatedAt error>>>>", err);
-                    }
-                  }
-                );
-
-                const payload = {
-                  id: data._id,
-                  name: data["name"],
-                  email: data["email"],
-                  phone: data["phone"],
-                  type: data["type"],
-                  pstatus: data["password"] == "" ? false : true 
-                };
-                
-                const accessToken = jwt.sign(payload, key, {
-                  expiresIn: "30d",
-                });
-
-                response.status(200).send({
-                  result: "ok",
-                  data: {
-                    payload,
-                    token: accessToken,
-                  },
-                });
-              } else {
-                response.status(200).send({
-                  errors: [
-                    {
-                      msg: "Oops! Password not matched",
-                      param: "password",
-                    },
-                  ],
-                });
+          if(body.loginType == "normal"){
+            console.log("if data");
+            bcrypt.compare(
+              body.password,
+              data["password"],
+              async function (err, result) {
+                if (err) throw err;
+                if (result) {
+                  console.log("if bcrypt");
+                  status = true;
+                } else {
+                  status = false;
+                }
               }
-            }
-          );
+            );
+          }
+
+          if(status == true){
+            await UserModel.updateOne(
+              { email: body.email },
+              { updatedAt: new Date(), lastlogindate: new Date() },
+              { upsert: true, useFindAndModify: false },
+              function (err, result) {
+                if (result) {
+                  console.log("updatedAt update>>>>", result);
+                } else {
+                  console.log("updatedAt error>>>>", err);
+                }
+              }
+            );
+
+            const payload = {
+              id: data._id,
+              name: data["name"],
+              email: data["email"],
+              phone: data["phone"],
+              type: data["type"],
+              pstatus: data["password"] == "" ? false : true 
+            };
+            
+            const accessToken = jwt.sign(payload, key, {
+              expiresIn: "30d",
+            });
+
+            response.status(200).send({
+              result: "ok",
+              data: {
+                payload,
+                token: accessToken,
+              },
+            });
+          }else{
+            response.status(200).send({
+              errors: [
+                {
+                  msg: "Oops! Password not matched",
+                  param: "password",
+                },
+              ],
+            });
+          }
+          
         } else {
           response.status(200).send({
             errors: [

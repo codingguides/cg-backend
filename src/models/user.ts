@@ -16,6 +16,10 @@ const UserSchema = new Schema({
         type:String,
         enum: ["admin", "authorized", "others"],
     }, 
+    loginType:{
+        type:String,
+        enum: ["normal", "google", "linkedin"],
+    },
     isdelete: { 
         type: Boolean
     },

@@ -21,9 +21,11 @@ exports.UserController = (0, express_1.Router)();
  ** API NAME: User signup
  ** Methode: POST
  */
-exports.UserController.post("/signup", (0, express_validator_1.body)("email", "Invalid Email!").isEmail(), (0, express_validator_1.body)("password", "Password must be at least 8 characters long!").isLength({
-    min: 8,
-}), (0, express_validator_1.check)("name").not().isEmpty().withMessage("Name is required"), (0, express_validator_1.check)("phone").not().isEmpty().withMessage("Phone is required"), async (request, response, next) => {
+exports.UserController.post("/signup", (0, express_validator_1.body)("email", "Invalid Email!").isEmail(), 
+// body("password", "Password must be at least 8 characters long!").isLength({
+//   min: 8,
+// }),
+(0, express_validator_1.check)("name").not().isEmpty().withMessage("Name is required"), (0, express_validator_1.check)("phone").not().isEmpty().withMessage("Phone is required"), (0, express_validator_1.check)("loginType").not().isEmpty().withMessage("loginType is required"), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
         return response.status(200).send({
@@ -35,6 +37,17 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
         try {
             const { body } = request;
             await models_1.UserModel.syncIndexes();
+            if (body.loginType == "normal" && body.password == "") {
+                response.status(200).send({
+                    result: "error",
+                    errors: [
+                        {
+                            success: false,
+                            msg: "Password must be at least 8 characters long!",
+                        },
+                    ],
+                });
+            }
             const data = await models_1.UserModel.find({
                 $or: [{ email: body.email }, { phone: body.phone }],
             });
@@ -54,10 +67,11 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
                     name: body.name,
                     email: body.email,
                     phone: body.phone,
-                    password: await hashPassword(body.password),
+                    password: body.pasword == "" ? "" : await hashPassword(body.password),
                     type: body.type,
                     isdelete: 0,
                     lastlogindate: new Date(),
+                    loginType: "normal"
                 });
                 userData.save(async (err, data) => {
                     if (data) {
@@ -170,21 +184,26 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
                     </center>
                     </body>`,
                         };
-                        await (0, common_1.senTMail)(mailOptions)
-                            .then((res) => {
-                            response.status(200).send({
-                                success: true,
-                                message: "Signup successfully.",
-                                data: userData,
-                            });
-                        })
-                            .catch((error) => {
-                            response.status(404).send({
-                                success: false,
-                                message: "Oops! Mail not send. ",
-                                error: error,
-                            });
+                        response.status(200).send({
+                            success: true,
+                            message: "Signup successfully.",
+                            data: userData,
                         });
+                        // await senTMail(mailOptions)
+                        //   .then((res) => {
+                        //     response.status(200).send({
+                        //       success: true,
+                        //       message: "Signup successfully.",
+                        //       data: userData,
+                        //     });
+                        //   })
+                        //   .catch((error) => {
+                        //     response.status(404).send({
+                        //       success: false,
+                        //       message: "Oops! Mail not send. ",
+                        //       error: error,
+                        //     });
+                        //   });
                     }
                     else if (err)
                         throw err;
@@ -192,7 +211,6 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
             }
         }
         catch (error) {
-            console.log("error>>>>>>else>>>>>>>>>>>", error);
             next(error);
         }
     }
@@ -415,9 +433,7 @@ exports.UserController.put("/reset-password/:id", async (request, response, next
  ** API NAME: User login
  ** Methode: POST
  */
-exports.UserController.post("/login", (0, express_validator_1.body)("email", "Invalid Email!").isEmail(), (0, express_validator_1.body)("password", "Password must be at least 5 characters long!").isLength({
-    min: 5,
-}), async (request, response, next) => {
+exports.UserController.post("/login", (0, express_validator_1.body)("email", "Invalid Email!").isEmail(), (0, express_validator_1.check)("loginType").not().isEmpty().withMessage("loginType is required"), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
         return response.status(200).send({
@@ -428,49 +444,72 @@ exports.UserController.post("/login", (0, express_validator_1.body)("email", "In
         try {
             const { body } = request;
             const data = await models_1.UserModel.findOne({ email: body.email });
+            let status = false;
             if (data) {
-                console.log("if data");
-                bcrypt.compare(body.password, data["password"], async function (err, result) {
-                    // if (err) throw err;
-                    if (result) {
-                        console.log("if bcrypt");
-                        await models_1.UserModel.updateOne({ email: body.email }, { updatedAt: new Date(), lastlogindate: new Date() }, { upsert: true, useFindAndModify: false }, function (err, result) {
-                            if (result) {
-                                console.log("updatedAt update>>>>", result);
-                            }
-                            else {
-                                console.log("updatedAt error>>>>", err);
-                            }
-                        });
-                        const payload = {
-                            id: data._id,
-                            name: data["name"],
-                            email: data["email"],
-                            phone: data["phone"],
-                            type: data["type"],
-                        };
-                        const accessToken = jwt.sign(payload, key, {
-                            expiresIn: "30d",
-                        });
-                        response.status(200).send({
-                            result: "ok",
-                            data: {
-                                payload,
-                                token: accessToken,
+                status = true;
+                if (body.loginType == "normal" && body.password == "") {
+                    response.status(200).send({
+                        result: "error",
+                        errors: [
+                            {
+                                success: false,
+                                msg: "Password must be at least 8 characters long!",
                             },
-                        });
-                    }
-                    else {
-                        response.status(200).send({
-                            errors: [
-                                {
-                                    msg: "Oops! Password not matched",
-                                    param: "password",
-                                },
-                            ],
-                        });
-                    }
-                });
+                        ],
+                    });
+                }
+                if (body.loginType == "normal") {
+                    console.log("if data");
+                    bcrypt.compare(body.password, data["password"], async function (err, result) {
+                        if (err)
+                            throw err;
+                        if (result) {
+                            console.log("if bcrypt");
+                            status = true;
+                        }
+                        else {
+                            status = false;
+                        }
+                    });
+                }
+                if (status == true) {
+                    await models_1.UserModel.updateOne({ email: body.email }, { updatedAt: new Date(), lastlogindate: new Date() }, { upsert: true, useFindAndModify: false }, function (err, result) {
+                        if (result) {
+                            console.log("updatedAt update>>>>", result);
+                        }
+                        else {
+                            console.log("updatedAt error>>>>", err);
+                        }
+                    });
+                    const payload = {
+                        id: data._id,
+                        name: data["name"],
+                        email: data["email"],
+                        phone: data["phone"],
+                        type: data["type"],
+                        pstatus: data["password"] == "" ? false : true
+                    };
+                    const accessToken = jwt.sign(payload, key, {
+                        expiresIn: "30d",
+                    });
+                    response.status(200).send({
+                        result: "ok",
+                        data: {
+                            payload,
+                            token: accessToken,
+                        },
+                    });
+                }
+                else {
+                    response.status(200).send({
+                        errors: [
+                            {
+                                msg: "Oops! Password not matched",
+                                param: "password",
+                            },
+                        ],
+                    });
+                }
             }
             else {
                 response.status(200).send({
@@ -486,6 +525,28 @@ exports.UserController.post("/login", (0, express_validator_1.body)("email", "In
         catch (error) {
             next(error);
         }
+    }
+});
+exports.UserController.post("/social-login", async (request, response, next) => {
+    try {
+        const { body } = request;
+        const data = await models_1.UserModel.findOne({ email: body.email });
+        if (data) {
+            console.log("if data");
+            response.status(200).send({
+                status: true,
+                nextcall: 'signin'
+            });
+        }
+        else {
+            response.status(200).send({
+                status: true,
+                nextcall: 'signup'
+            });
+        }
+    }
+    catch (error) {
+        next(error);
     }
 });
 //# sourceMappingURL=user.js.map

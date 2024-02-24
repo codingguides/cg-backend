@@ -20,6 +20,7 @@ exports.ProfileController.put("/update/:id", async (request, response, next) => 
         var _id = new ObjectId(id);
         const query = { _id: ObjectId(_id) };
         await models_1.UserModel.updateOne(query, body, { upsert: true, useFindAndModify: false }, async function (err, result) {
+            console.log("result>>>>>0", result);
             if (result) {
                 await models_1.UserModel.findOne(query).then((data) => {
                     if (data) {
@@ -94,32 +95,52 @@ exports.ProfileController.put("/update-password/:id", async (request, response, 
         const query = { _id: ObjectId(_id) };
         const data = await models_1.UserModel.findOne(query);
         if (data) {
-            bcrypt.compare(body.oldpassword, data["password"], async function (error, result) {
-                if (result) {
-                    await models_1.UserModel.updateOne(query, { password: await hashPassword(body.newpassword) }, { upsert: true, useFindAndModify: false }, async function (err, result) {
-                        if (result) {
-                            response.status(200).send({
-                                status: "SUCCESS",
-                                msg: "Profile Password Updated Successfully",
-                            });
-                        }
-                        else {
-                            response.status(404).send({
-                                status: "ERROR",
-                                msg: "Oops! Something wrong.",
-                                err,
-                            });
-                        }
-                    });
-                }
-                else {
-                    response.status(404).send({
-                        status: "ERROR",
-                        msg: "Oops! Current password not match.",
-                        error,
-                    });
-                }
-            });
+            if (data["password"] == "") {
+                const update = await models_1.UserModel.updateOne(query, { password: await hashPassword(body.newpassword) }, { upsert: true, useFindAndModify: false }, async function (err, result) {
+                    if (result) {
+                        response.status(200).send({
+                            status: "SUCCESS",
+                            msg: "Profile Password Updated Successfully",
+                        });
+                    }
+                    else {
+                        response.status(200).send({
+                            status: "ERROR",
+                            msg: "Oops! Something wrong.",
+                            err,
+                        });
+                    }
+                });
+                console.log("update>>>>>>", update);
+            }
+            else {
+                bcrypt.compare(body.oldpassword, data["password"], async function (error, result) {
+                    if (result) {
+                        await models_1.UserModel.updateOne(query, { password: await hashPassword(body.newpassword) }, { upsert: true, useFindAndModify: false }, async function (err, result) {
+                            if (result) {
+                                response.status(200).send({
+                                    status: "SUCCESS",
+                                    msg: "Profile Password Updated Successfully",
+                                });
+                            }
+                            else {
+                                response.status(404).send({
+                                    status: "ERROR",
+                                    msg: "Oops! Something wrong.",
+                                    err,
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        response.status(200).send({
+                            status: "ERROR",
+                            msg: "Oops! Current password not match.",
+                            error,
+                        });
+                    }
+                });
+            }
         }
     }
     catch (error) {

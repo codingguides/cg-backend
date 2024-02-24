@@ -6,20 +6,22 @@ const models_1 = require("../../models");
 const express_validator_1 = require("express-validator");
 const common_1 = require("../../common");
 exports.FrontendController = (0, express_1.Router)();
-exports.FrontendController.get('/get-menu', async (request, response, next) => {
+exports.FrontendController.get("/get-menu", async (request, response, next) => {
     try {
-        await models_1.TopicModel.find({ "showNav": true }).sort({ index_no: 1 }).then((val) => {
+        await models_1.TopicModel.find({ showNav: true })
+            .sort({ index_no: 1 })
+            .then((val) => {
             if (val) {
                 response.status(200).send({
-                    "status": "SUCCESS",
-                    "msg": "Topics details successfully",
-                    "payload": val
+                    status: "SUCCESS",
+                    msg: "Topics details successfully",
+                    payload: val,
                 });
             }
             else {
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! topic not found."
+                    status: "ERROR",
+                    msg: "Oops! topic not found.",
                 });
             }
         });
@@ -28,20 +30,22 @@ exports.FrontendController.get('/get-menu', async (request, response, next) => {
         next(error);
     }
 });
-exports.FrontendController.get('/get-feature-item', async (request, response, next) => {
+exports.FrontendController.get("/get-feature-item", async (request, response, next) => {
     try {
-        await models_1.TopicModel.find({ "showFeatures": true }).sort({ index_no: 1 }).then((val) => {
+        await models_1.TopicModel.find({ showFeatures: true })
+            .sort({ index_no: 1 })
+            .then((val) => {
             if (val) {
                 response.status(200).send({
-                    "status": "SUCCESS",
-                    "msg": "Features details successfully",
-                    "payload": val
+                    status: "SUCCESS",
+                    msg: "Features details successfully",
+                    payload: val,
                 });
             }
             else {
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! features not found."
+                    status: "ERROR",
+                    msg: "Oops! features not found.",
                 });
             }
         });
@@ -50,18 +54,18 @@ exports.FrontendController.get('/get-feature-item', async (request, response, ne
         next(error);
     }
 });
-exports.FrontendController.get('/get-sidebar-menu', async (request, response, next) => {
+exports.FrontendController.get("/get-sidebar-menu", async (request, response, next) => {
     try {
         async function buildCategoryTree(categories) {
             const categoryMap = {}; // Use a map for faster lookups
             // Create a map of categories using _id as keys
-            categories.forEach(category => {
+            categories.forEach((category) => {
                 categoryMap[category._id] = category;
                 category.children = [];
             });
             const tree = [];
             // Organize categories into a tree structure
-            categories.forEach(category => {
+            categories.forEach((category) => {
                 if (category.parent_id) {
                     const parentCategory = categoryMap[category.parent_id];
                     if (parentCategory) {
@@ -83,14 +87,14 @@ exports.FrontendController.get('/get-sidebar-menu', async (request, response, ne
                         _id: String(topic._id),
                         name: String(topic.name),
                         slug: String(topic.slug),
-                        parent_id: String(topic.parent_id)
+                        parent_id: String(topic.parent_id),
                     };
                 }
                 else {
                     obj = {
                         _id: String(topic._id),
                         name: String(topic.name),
-                        slug: String(topic.slug)
+                        slug: String(topic.slug),
                     };
                 }
                 cateList.push(obj);
@@ -99,15 +103,15 @@ exports.FrontendController.get('/get-sidebar-menu', async (request, response, ne
         const categoryTree = await buildCategoryTree(cateList);
         if (categoryTree) {
             response.status(200).send({
-                "status": "SUCCESS",
-                "msg": "Topics details successfully",
-                "payload": categoryTree
+                status: "SUCCESS",
+                msg: "Topics details successfully",
+                payload: categoryTree,
             });
         }
         else {
             response.status(404).send({
-                "status": "ERROR",
-                "msg": "Oops! topic not found."
+                status: "ERROR",
+                msg: "Oops! topic not found.",
             });
         }
     }
@@ -115,29 +119,29 @@ exports.FrontendController.get('/get-sidebar-menu', async (request, response, ne
         next(error);
     }
 });
-exports.FrontendController.get('/get-quiz-list/:slug', async (request, response, next) => {
+exports.FrontendController.get("/get-quiz-list/:slug", async (request, response, next) => {
     try {
         const { slug } = request.params;
-        var ObjectId = require('mongodb').ObjectId;
-        await models_1.TopicModel.findOne({ "slug": slug }).then(async (val) => {
+        var ObjectId = require("mongodb").ObjectId;
+        await models_1.TopicModel.findOne({ slug: slug }).then(async (val) => {
             console.log(val);
             console.log(val._id);
             if (val && val._id) {
                 console.log("if");
-                await models_1.TopicModel.find({ "parent_id": ObjectId(val._id) }).then((sublist) => {
+                await models_1.TopicModel.find({ parent_id: ObjectId(val._id) }).then((sublist) => {
                     if (sublist) {
                         console.log("sublist if", sublist);
                         response.status(200).send({
-                            "status": "SUCCESS",
-                            "msg": "Sub Topics details successfully",
-                            "payload": sublist
+                            status: "SUCCESS",
+                            msg: "Sub Topics details successfully",
+                            payload: sublist,
                         });
                     }
                     else {
                         console.log("sub else");
                         response.status(200).send({
-                            "status": "ERROR",
-                            "msg": "Oops! sub topic not found."
+                            status: "ERROR",
+                            msg: "Oops! sub topic not found.",
                         });
                     }
                 });
@@ -145,8 +149,8 @@ exports.FrontendController.get('/get-quiz-list/:slug', async (request, response,
             else {
                 console.log("else");
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! slug not found."
+                    status: "ERROR",
+                    msg: "Oops! slug not found.",
                 });
             }
         });
@@ -155,19 +159,19 @@ exports.FrontendController.get('/get-quiz-list/:slug', async (request, response,
         next(error);
     }
 });
-exports.FrontendController.get('/search/:topic', async (request, response, next) => {
+exports.FrontendController.get("/search/:topic", async (request, response, next) => {
     try {
         const { topic } = request.params;
         await models_1.TagsModel.aggregate([
-            { $match: { 'name': { '$regex': topic.toUpperCase() }, type: 'topic' } },
+            { $match: { name: { $regex: topic.toUpperCase() }, type: "topic" } },
             {
                 $lookup: {
                     from: "topics",
                     localField: "topic_id",
                     foreignField: "_id",
-                    as: "topicDetails"
+                    as: "topicDetails",
                 },
-            }
+            },
         ]).then(async (val) => {
             console.log(val);
             let newarray = [];
@@ -180,15 +184,15 @@ exports.FrontendController.get('/search/:topic', async (request, response, next)
                     }
                 });
                 response.status(200).send({
-                    "status": "SUCCESS",
-                    "msg": "Topics details successfully",
-                    "payload": newarray
+                    status: "SUCCESS",
+                    msg: "Topics details successfully",
+                    payload: newarray,
                 });
             }
             else {
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! topic not found."
+                    status: "ERROR",
+                    msg: "Oops! topic not found.",
                 });
             }
         });
@@ -197,14 +201,14 @@ exports.FrontendController.get('/search/:topic', async (request, response, next)
         next(error);
     }
 });
-exports.FrontendController.get('/quiz/:slug', async (request, response, next) => {
+exports.FrontendController.get("/quiz/:slug", async (request, response, next) => {
     try {
         const { slug } = request.params;
-        var ObjectId = require('mongodb').ObjectId;
-        await models_1.TopicModel.findOne({ "slug": slug }).then(async (val) => {
+        var ObjectId = require("mongodb").ObjectId;
+        await models_1.TopicModel.findOne({ slug: slug }).then(async (val) => {
             console.log("val>>>>>>>>>>>>>", val);
             if (val && val._id) {
-                await models_1.RelationModel.find({ 'topic_id': ObjectId(val._id) }, { question_id: 1 }).then(async (relationdata) => {
+                await models_1.RelationModel.find({ topic_id: ObjectId(val._id) }, { question_id: 1 }).then(async (relationdata) => {
                     const relationIds = relationdata.map((rel) => ObjectId(rel.question_id));
                     console.log(relationIds, "<<<<<<<<<<<<relationdata>>>>>>>>>>>>>", relationdata);
                     if (relationdata) {
@@ -212,31 +216,31 @@ exports.FrontendController.get('/quiz/:slug', async (request, response, next) =>
                             console.log("questions>>>>>>>>>>>>>", questions);
                             if (questions) {
                                 response.status(200).send({
-                                    "status": "SUCCESS",
-                                    "msg": "Questions details successfully",
-                                    "payload": questions
+                                    status: "SUCCESS",
+                                    msg: "Questions details successfully",
+                                    payload: questions,
                                 });
                             }
                             else {
                                 response.status(200).send({
-                                    "status": "ERROR",
-                                    "msg": "Oops! questions not found."
+                                    status: "ERROR",
+                                    msg: "Oops! questions not found.",
                                 });
                             }
                         });
                     }
                     else {
                         response.status(200).send({
-                            "status": "ERROR",
-                            "msg": "Oops! relation not found."
+                            status: "ERROR",
+                            msg: "Oops! relation not found.",
                         });
                     }
                 });
             }
             else {
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! relation not found."
+                    status: "ERROR",
+                    msg: "Oops! relation not found.",
                 });
             }
         });
@@ -245,12 +249,12 @@ exports.FrontendController.get('/quiz/:slug', async (request, response, next) =>
         next(error);
     }
 });
-exports.FrontendController.post('/newsletter', (0, express_validator_1.body)('email', "Invalid Email!").isEmail(), async (request, response, next) => {
+exports.FrontendController.post("/newsletter", (0, express_validator_1.body)("email", "Invalid Email!").isEmail(), async (request, response, next) => {
     const errors = (0, express_validator_1.validationResult)(request);
     if (!errors.isEmpty()) {
         return response.status(200).send({
-            result: 'error',
-            "errors": errors.array()
+            result: "error",
+            errors: errors.array(),
         });
     }
     else {
@@ -258,24 +262,22 @@ exports.FrontendController.post('/newsletter', (0, express_validator_1.body)('em
             const { body } = request;
             await models_1.NewsletterModel.syncIndexes();
             const data = await models_1.NewsletterModel.find({
-                $or: [
-                    { "email": body.email }
-                ]
+                $or: [{ email: body.email }],
             });
             if (data.length > 0) {
                 response.status(200).send({
-                    result: 'error',
-                    "errors": [
+                    result: "error",
+                    errors: [
                         {
-                            "success": false,
-                            "msg": "This email already exists in our system."
-                        }
-                    ]
+                            success: false,
+                            msg: "This email already exists in our system.",
+                        },
+                    ],
                 });
             }
             else {
                 let userData = new models_1.NewsletterModel({
-                    email: body.email
+                    email: body.email,
                 });
                 userData.save(async (err, data) => {
                     if (data) {
@@ -393,16 +395,18 @@ exports.FrontendController.post('/newsletter', (0, express_validator_1.body)('em
                     </center>
                     </body>`,
                         };
-                        await (0, common_1.senTMail)(mailOptions).then((res) => {
+                        await (0, common_1.senTMail)(mailOptions)
+                            .then((res) => {
                             response.status(200).send({
-                                "success": true,
-                                "msg": "We will get back to you soon."
+                                success: true,
+                                msg: "We will get back to you soon.",
                             });
-                        }).catch((error) => {
+                        })
+                            .catch((error) => {
                             response.status(404).send({
-                                "success": false,
-                                "message": "Oops! Mail not send. ",
-                                "error": error
+                                success: false,
+                                message: "Oops! Mail not send. ",
+                                error: error,
                             });
                         });
                     }
@@ -416,20 +420,22 @@ exports.FrontendController.post('/newsletter', (0, express_validator_1.body)('em
         }
     }
 });
-exports.FrontendController.get('/blog', async (request, response, next) => {
+exports.FrontendController.get("/blog", async (request, response, next) => {
     try {
-        await models_1.BlogModel.find().limit(10).then((val) => {
+        await models_1.BlogModel.find()
+            .limit(10)
+            .then((val) => {
             if (val) {
                 response.status(200).send({
-                    "status": "SUCCESS",
-                    "msg": "Blog details successfully",
-                    "payload": val
+                    status: "SUCCESS",
+                    msg: "Blog details successfully",
+                    payload: val,
                 });
             }
             else {
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! blog not found."
+                    status: "ERROR",
+                    msg: "Oops! blog not found.",
                 });
             }
         });
@@ -439,46 +445,46 @@ exports.FrontendController.get('/blog', async (request, response, next) => {
     }
 });
 // For forntend example details page by category
-exports.FrontendController.get('/blog/:category', async (request, response, next) => {
+exports.FrontendController.get("/blog/:category", async (request, response, next) => {
     try {
         const { category } = request.params;
-        await models_1.TopicModel.findOne({ "slug": category }).then(async (val) => {
+        await models_1.TopicModel.findOne({ slug: category }).then(async (val) => {
             if (val) {
                 await models_1.BlogCategoryModel.syncIndexes();
                 await models_1.BlogCategoryModel.aggregate([
-                    { $match: { 'category': { '$regex': category } } },
+                    { $match: { category: { $regex: category } } },
                     {
                         $lookup: {
                             from: "blogs",
                             localField: "_id",
                             foreignField: "category_id",
-                            as: "blogDetails"
+                            as: "blogDetails",
                         },
                     },
-                    { $sort: { category: 1 } }
+                    { $sort: { category: 1 } },
                 ]).then(async (res) => {
                     if (res) {
                         response.status(200).send({
-                            "status": "SUCCESS",
-                            "msg": "Blog details successfully",
-                            "payload": {
-                                "topic": val,
-                                "res": res
-                            }
+                            status: "SUCCESS",
+                            msg: "Blog details successfully",
+                            payload: {
+                                topic: val,
+                                res: res,
+                            },
                         });
                     }
                     else {
                         response.status(200).send({
-                            "status": "ERROR",
-                            "msg": "Oops! Relation not found."
+                            status: "ERROR",
+                            msg: "Oops! Relation not found.",
                         });
                     }
                 });
             }
             else {
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! blog not found."
+                    status: "ERROR",
+                    msg: "Oops! blog not found.",
                 });
             }
         });
@@ -488,26 +494,28 @@ exports.FrontendController.get('/blog/:category', async (request, response, next
     }
 });
 // For forntend example blog inner page
-exports.FrontendController.get('/blog/inner/:slug', async (request, response, next) => {
+exports.FrontendController.get("/blog/inner/:slug", async (request, response, next) => {
     try {
         const { slug } = request.params;
         var ObjectId = require("mongodb").ObjectId;
-        await models_1.BlogModel.findOne({ "slug": slug }).then(async (val) => {
+        await models_1.BlogModel.findOne({ sort_slug: slug }).then(async (val) => {
             if (val) {
-                let relatedBlogList = await models_1.BlogModel.find({ "category_id": ObjectId(val.category_id) });
+                let relatedBlogList = await models_1.BlogModel.find({
+                    category_id: ObjectId(val.category_id),
+                });
                 response.status(200).send({
-                    "status": "SUCCESS",
-                    "msg": "Blog details successfully",
-                    "payload": {
-                        "blogDetails": val,
-                        "relatedBlogList": relatedBlogList
-                    }
+                    status: "SUCCESS",
+                    msg: "Blog details successfully",
+                    payload: {
+                        blogDetails: val,
+                        relatedBlogList: relatedBlogList,
+                    },
                 });
             }
             else {
                 response.status(200).send({
-                    "status": "ERROR",
-                    "msg": "Oops! blog not found."
+                    status: "ERROR",
+                    msg: "Oops! blog not found.",
                 });
             }
         });

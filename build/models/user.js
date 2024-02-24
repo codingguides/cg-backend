@@ -19,6 +19,10 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         enum: ["admin", "authorized", "others"],
     },
+    loginType: {
+        type: String,
+        enum: ["normal", "google", "linkedin"],
+    },
     isdelete: {
         type: Boolean
     },
