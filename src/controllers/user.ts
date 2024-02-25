@@ -21,11 +21,7 @@ export const UserController = Router();
 UserController.post(
   "/signup",
   body("email", "Invalid Email!").isEmail(),
-  // body("password", "Password must be at least 8 characters long!").isLength({
-  //   min: 8,
-  // }),
   check("name").not().isEmpty().withMessage("Name is required"),
-  check("phone").not().isEmpty().withMessage("Phone is required"),
   check("loginType").not().isEmpty().withMessage("loginType is required"),
 
   async (request: Request, response: Response, next: NextFunction) => {
@@ -39,6 +35,20 @@ UserController.post(
       try {
         const { body } = request;
         await UserModel.syncIndexes();
+        let loginType = ["normal", "google", "linkedin"];
+
+
+        if(loginType.includes(body.loginType) == false){
+          response.status(200).send({
+            result: "error",
+            errors: [
+              {
+                success: false,
+                msg: "Password must be at least 8 characters long!",
+              },
+            ],
+          });
+        }
 
         if(body.loginType == "normal" && body.password == ""){
           response.status(200).send({
@@ -52,9 +62,7 @@ UserController.post(
           });
         }
 
-        const data = await UserModel.find({
-          $or: [{ email: body.email }, { phone: body.phone }],
-        });
+        const data = await UserModel.find({ email: body.email });
 
         if (data.length > 0) {
           response.status(200).send({
@@ -62,21 +70,35 @@ UserController.post(
             errors: [
               {
                 success: false,
-                msg: "An Account already exists with this email or phone number.",
+                msg: "An Account already exists with this email.",
               },
             ],
           });
         } else {
-          let userData = new UserModel({
-            name: body.name,
-            email: body.email,
-            phone: body.phone,
-            password: body.pasword == "" ? "" : await hashPassword(body.password),
-            type: body.type,
-            isdelete: 0,
-            lastlogindate: new Date(),
-            loginType: "normal"
-          });
+          let payloadbody = {}
+          if(body.loginType == "normal"){
+            payloadbody = {
+              name: body.name,
+              email: body.email,
+              phone: body.phone,
+              password: await hashPassword(body.password),
+              type: body.type,
+              isdelete: 0,
+              lastlogindate: new Date(),
+              loginType: "normal"
+            }
+          }else{
+            payloadbody = {
+              name: body.name,
+              email: body.email,
+              type: body.type,
+              isdelete: 0,
+              lastlogindate: new Date(),
+              loginType: body.loginType
+            }
+          }
+
+          let userData = new UserModel(payloadbody);
           userData.save(async (err, data) => {
             if (data) {
               const mailOptions = {
@@ -471,6 +493,20 @@ UserController.post(
         let status:boolean = false;
         if (data) {
           status = true;
+
+          let loginType = ["normal", "google", "linkedin"];
+          if(loginType.includes(body.loginType) == false) {
+            response.status(400).send({
+              result: "error",
+              errors: [
+                {
+                  success: false,
+                  msg: "Oops! Wrong login type",
+                },
+              ],
+            });
+          }
+
           if(body.loginType == "normal" && body.password == ""){
             response.status(200).send({
               result: "error",
@@ -482,6 +518,8 @@ UserController.post(
               ],
             });
           }
+
+          
 
           if(body.loginType == "normal"){
             console.log("if data");
