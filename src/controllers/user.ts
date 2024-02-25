@@ -44,7 +44,7 @@ UserController.post(
             errors: [
               {
                 success: false,
-                msg: "Password must be at least 8 characters long!",
+                msg: "Oops! Wrong login type",
               },
             ],
           });
