@@ -94,7 +94,8 @@ UserController.post(
               type: body.type,
               isdelete: 0,
               lastlogindate: new Date(),
-              loginType: body.loginType
+              loginType: body.loginType,
+              profile_pic: body.profile_pic
             }
           }
 

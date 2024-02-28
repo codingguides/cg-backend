@@ -89,7 +89,8 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
                         type: body.type,
                         isdelete: 0,
                         lastlogindate: new Date(),
-                        loginType: body.loginType
+                        loginType: body.loginType,
+                        profile_pic: body.profile_pic
                     };
                 }
                 let userData = new models_1.UserModel(payloadbody);
