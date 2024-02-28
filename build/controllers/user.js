@@ -118,6 +118,7 @@ exports.UserController.post("/signup", (0, express_validator_1.body)("email", "I
                                 email: data["email"],
                                 phone: data["phone"],
                                 type: data["type"],
+                                profile_pic: data['profile_pic'],
                                 pstatus: data["password"] == "" ? false : true
                             };
                             const accessToken = jwt.sign(payload, key, {
@@ -549,6 +550,7 @@ exports.UserController.post("/login", (0, express_validator_1.body)("email", "In
                         email: data["email"],
                         phone: data["phone"],
                         type: data["type"],
+                        profile_pic: data['profile_pic'],
                         pstatus: data["password"] == "" ? false : true
                     };
                     const accessToken = jwt.sign(payload, key, {

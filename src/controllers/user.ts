@@ -128,6 +128,7 @@ UserController.post(
                   email: data["email"],
                   phone: data["phone"],
                   type: data["type"],
+                  profile_pic: data['profile_pic'],
                   pstatus: data["password"] == "" ? false : true 
                 };
                 
@@ -597,6 +598,7 @@ UserController.post(
               email: data["email"],
               phone: data["phone"],
               type: data["type"],
+              profile_pic: data['profile_pic'],
               pstatus: data["password"] == "" ? false : true 
             };
             
