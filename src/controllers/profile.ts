@@ -23,6 +23,8 @@ ProfileController.put(
 
       const query = { _id: ObjectId(_id) };
 
+      console.log("query>>>>>",query)
+
       await UserModel.updateOne(
         query,
         body,
@@ -35,10 +37,13 @@ ProfileController.put(
               if (data) {
                 const payload = {
                   id: data._id,
-                  name: data["name"],
-                  email: data["email"],
-                  phone: data["phone"],
-                  type: data["type"],
+                  name: body.name,
+                  email: body.email,
+                  type: body.type,
+                  isdelete: 0,
+                  lastlogindate: new Date(),
+                  loginType: body.loginType,
+                  profile_pic: body.profile_pic
                 };
                 const accessToken = jwt.sign(payload, key, {
                   expiresIn: "30d",
