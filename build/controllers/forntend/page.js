@@ -30,9 +30,15 @@ exports.FrontendController.get("/get-menu", async (request, response, next) => {
         next(error);
     }
 });
-exports.FrontendController.get("/get-feature-item", async (request, response, next) => {
+exports.FrontendController.get("/get-feature-item/:flag", async (request, response, next) => {
     try {
-        await models_1.TopicModel.find({ showFeatures: true })
+        const { flag } = request.params;
+        let query = {};
+        if (flag == "true") {
+            query = { showFeatures: true };
+        }
+        console.log("query>>>>>>>>", query);
+        await models_1.TopicModel.find(query)
             .sort({ index_no: 1 })
             .then((val) => {
             if (val) {

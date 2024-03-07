@@ -40,10 +40,16 @@ FrontendController.get(
 );
 
 FrontendController.get(
-  "/get-feature-item",
+  "/get-feature-item/:flag",
   async (request: Request, response: Response, next: NextFunction) => {
     try {
-      await TopicModel.find({ showFeatures: true })
+      const { flag } = request.params;
+      let query = {}
+      if(flag == "true"){
+        query = { showFeatures: true }
+      }
+      console.log("query>>>>>>>>",query)
+      await TopicModel.find(query)
         .sort({ index_no: 1 })
         .then((val) => {
           if (val) {
